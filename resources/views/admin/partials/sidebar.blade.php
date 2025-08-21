@@ -56,6 +56,59 @@
             </li>
 
 
+            <!-- Users -->
+
+            <li class="menu {{ request()->routeIs('users.*') ? 'active' : '' }}">
+                <a href="{{ route('users.index') }}" class="dropdown-toggle">
+                    <div>
+                        <!-- Multi-users icon -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="feather">
+                            <!-- Main head -->
+                            <circle cx="12" cy="8" r="4" />
+                            <!-- Left head -->
+                            <circle cx="6" cy="12" r="3" />
+                            <!-- Right head -->
+                            <circle cx="18" cy="12" r="3" />
+                            <!-- Shoulders / bodies -->
+                            <path d="M6 15v3" />
+                            <path d="M18 15v3" />
+                            <path d="M12 12v6" />
+                        </svg>
+                        <span>Users</span>
+                    </div>
+                </a>
+            </li>
+
+
+            <!-- Transaction Histories -->
+
+            <li class="menu {{ request()->routeIs('transaction_histories.*') ? 'active' : '' }}">
+                <a href="{{ route('transaction_histories.index') }}" class="dropdown-toggle">
+                    <div>
+                        <!-- Transaction / exchange icon -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather">
+                            <!-- Left arrow -->
+                            <line x1="17" y1="3" x2="7" y2="13"></line>
+                            <polyline points="7 3 7 13 17 13"></polyline>
+                            <!-- Right arrow -->
+                            <line x1="7" y1="21" x2="17" y2="11"></line>
+                            <polyline points="17 21 17 11 7 11"></polyline>
+                        </svg>
+                        <span>Transaction Histories</span>
+                    </div>
+                </a>
+            </li>
+
+
+
+
+
+
         </ul>
 
     </nav>

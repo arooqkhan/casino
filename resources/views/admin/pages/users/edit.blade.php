@@ -1,0 +1,82 @@
+@extends('admin.master.main')
+
+@section('content')
+
+<div class="row">
+    <div class="col-lg-12 layout-spacing layout-top-spacing">
+        <div class="widget-header">
+            <div class="row">
+                <div class="col-12 d-flex justify-content-between align-items-center mb-2">
+                    <h3>Edit User</h3>
+                    <a href="{{ route('users.index') }}" class="btn btn-success">Back</a>
+                </div>
+            </div>
+        </div>
+        <div class="statbox widget box box-shadow">
+            <div class="widget-content widget-content-area">
+                <form action="{{ route('users.update', $user->id) }}" method="POST">
+                    @csrf
+                    @method('PUT')
+
+                    <!-- First Name & Last Name -->
+                    <div class="row mb-4">
+                        <div class="col-sm-6">
+                            <label for="inputFirstName">First Name</label>
+                            <input type="text" class="form-control" id="inputFirstName" name="first_name" value="{{ old('first_name', $user->first_name) }}" required>
+                            @if ($errors->has('first_name'))
+                                <span class="text-danger">{{ $errors->first('first_name') }}</span>
+                            @endif
+                        </div>
+                        <div class="col-sm-6">
+                            <label for="inputLastName">Last Name</label>
+                            <input type="text" class="form-control" id="inputLastName" name="last_name" value="{{ old('last_name', $user->last_name) }}" required>
+                            @if ($errors->has('last_name'))
+                                <span class="text-danger">{{ $errors->first('last_name') }}</span>
+                            @endif
+                        </div>
+                    </div>
+
+                    <!-- DOB & Email -->
+                    <div class="row mb-4">
+                        <div class="col-sm-6">
+                            <label for="inputDob">Date of Birth</label>
+                            <input type="date" class="form-control" id="inputDob" name="dob" value="{{ old('dob', $user->dob) }}">
+                            @if ($errors->has('dob'))
+                                <span class="text-danger">{{ $errors->first('dob') }}</span>
+                            @endif
+                        </div>
+                        <div class="col-sm-6">
+                            <label for="inputEmail">Email</label>
+                            <input type="email" class="form-control" id="inputEmail" name="email" value="{{ old('email', $user->email) }}" required>
+                            @if ($errors->has('email'))
+                                <span class="text-danger">{{ $errors->first('email') }}</span>
+                            @endif
+                        </div>
+                    </div>
+
+                    <!-- Password & Address -->
+                    <div class="row mb-4">
+                        <div class="col-sm-12">
+                            <label for="inputPassword">Password (Leave blank to keep current)</label>
+                            <input type="password" class="form-control" id="inputPassword" name="password" placeholder="Enter New Password">
+                            @if ($errors->has('password'))
+                                <span class="text-danger">{{ $errors->first('password') }}</span>
+                            @endif
+                        </div>
+                        <div class="col-sm-6 mt-3">
+                            <label for="inputAddress">Address</label>
+                            <textarea class="form-control" id="inputAddress" name="address">{{ old('address', $user->address) }}</textarea>
+                            @if ($errors->has('address'))
+                                <span class="text-danger">{{ $errors->first('address') }}</span>
+                            @endif
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Update</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@endsection
