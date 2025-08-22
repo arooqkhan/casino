@@ -105,6 +105,75 @@
             </li>
 
 
+            <!--campaigns -->
+
+            <li class="menu {{ request()->routeIs('campaigns.*') ? 'active' : '' }}">
+                <a href="{{ route('campaigns.index') }}" class="dropdown-toggle">
+                    <div>
+                        <!-- Campaigns / Bullhorn Icon -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="feather">
+                            <path d="M3 11V5a2 2 0 0 1 2-2h1l7 7v6l-7 7H5a2 2 0 0 1-2-2v-6"></path>
+                            <line x1="15" y1="12" x2="21" y2="12"></line>
+                            <line x1="18" y1="9" x2="21" y2="12" x2="18" y2="15"></line>
+                        </svg>
+                        <span>Campaigns</span>
+                    </div>
+                </a>
+            </li>
+
+            <!-- Bonus -->
+
+            <li class="menu {{ request()->routeIs('bonus.*') ? 'active' : '' }}">
+                <a href="{{ route('bonus.index') }}" class="dropdown-toggle">
+                    <div>
+                        <!-- Bonus / Gift Icon -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="feather">
+                            <rect x="3" y="8" width="18" height="4" rx="1"></rect>
+                            <path d="M12 8v13"></path>
+                            <path d="M3 12v9a1 1 0 0 0 1 1h7"></path>
+                            <path d="M21 12v9a1 1 0 0 1-1 1h-7"></path>
+                            <path d="M7.5 8a2.5 2.5 0 1 1 5-2.5L12 8"></path>
+                            <path d="M16.5 8a2.5 2.5 0 1 0-5-2.5L12 8"></path>
+                        </svg>
+                        <span>Bonus</span>
+                    </div>
+                </a>
+            </li>
+
+
+            <!-- Created -->
+
+            <li class="menu {{ request()->routeIs('createds.*') ? 'active' : '' }}">
+                <a href="{{ route('createds.index') }}" class="dropdown-toggle">
+                    <div>
+                        <!-- Created (Document + Plus) Icon -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="feather">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="12" y1="18" x2="12" y2="12"></line>
+                            <line x1="9" y1="15" x2="15" y2="15"></line>
+                        </svg>
+                        <span>Created</span>
+                    </div>
+                </a>
+            </li>
+
+
+
+
+
+
+
+
 
 
 
