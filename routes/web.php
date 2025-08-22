@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminController\UserController;
 use App\Http\Controllers\AdminController\BonusController;
+use App\Http\Controllers\AdminController\WalletController;
 use App\Http\Controllers\AdminController\CreatedController;
 use App\Http\Controllers\AdminController\CampaignController;
 use App\Http\Controllers\AdminController\TransactionHistoryController;
@@ -29,6 +30,9 @@ Route::middleware('auth')->group(function () {
 
 
      Route::resource('createds', CreatedController::class);
+
+
+     Route::resource('wallet', WalletController::class);
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

@@ -66,7 +66,7 @@
         @endif
         <div class="widget-content widget-content-area">
             
-            <a href="{{ route('users.create') }}" class="btn btn-success m-2">Add Employee</a>
+            <a href="{{ route('users.create') }}" class="btn btn-success m-2">Add User</a>
           
             <table id="style-2" class="table style-2 dt-table-hover">
     <thead>
