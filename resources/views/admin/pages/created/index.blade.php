@@ -27,9 +27,6 @@
     <h4 class="m-2 mt-4">Created Cards</h4>
 
     <div class="statbox widget box box-shadow">
-        <div class="widget-content widget-content-area">
-
-            {{-- ✅ Success/Error Alerts --}}
             @if(session('success'))
                 <script>
                     document.addEventListener('DOMContentLoaded', function() {
@@ -63,10 +60,13 @@
                     });
                 </script>
             @endif
+            <div class="statbox widget box box-shadow">
+            <div class="widget-content widget-content-area">
 
-            {{-- ✅ Table --}}
-            <table id="style-2" class="table table-bordered table-striped">
-                <thead class="thead-dark">
+        
+           <table id="style-2" class="table style-2 dt-table-hover">
+   
+                 <thead>
                     <tr>
                         <th>ID</th>
                         <th>Card Holder</th>
@@ -83,7 +83,8 @@
                         <th>Created At</th>
                         <th class="text-center">Actions</th>
                     </tr>
-                </thead>
+                      </thead>
+           
                 <tbody>
                     @forelse($createds as $card)
                         <tr>
