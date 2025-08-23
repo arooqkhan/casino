@@ -6,17 +6,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class TransactionHistory extends Model
 {
-     protected $table = 'transaction_histories';
-
-    protected $fillable = [
-        'user_id',
-        'type',
-        'amount',
-        'status',
-        'is_sent',
-        'trans_type',
-        'payment_status',
-    ];
+    protected $guarded = [];
+    // protected $fillable = [
+    //     'user_id',
+    //     'type',
+    //     'amount',
+    //     'status',
+    //     'is_sent',
+    //     'trans_type',
+    //     'payment_status',
+    // ];
 
     /**
      * Each transaction belongs to a user

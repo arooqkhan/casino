@@ -100,13 +100,20 @@
                         <td>{{ $transaction->trans_type ?? '-' }}</td>
                         <td>{{ $transaction->created_at->format('d-m-Y') }}</td>
                         <td>
-                            <form action="{{ route('users.destroy', $user->id) }}" method="POST" style="display:inline;" class="delete-form">
+                            @if($transaction->type === 'withdraw' && $transaction->status == 0)
+                            <form action="{{ route('admin.transactions.approve', $transaction->id) }}" method="POST">
                                 @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-danger btn-sm delete-btn">
-                                    <i class="fas fa-trash-alt"></i>
+                                <button type="submit" class="btn btn-success">Approve</button>
+                            </form>
+                            <form action="{{ route('admin.transactions.reject', $transaction->id) }}" method="POST" style="display:inline;">
+                                @csrf
+                                <button type="submit" class="btn btn-warning btn-sm btn-circle" title="Reject">
+                                    <i class="fas fa-times"></i>
                                 </button>
                             </form>
+                            @endif
+
+
                         </td>
                     </tr>
                     @empty

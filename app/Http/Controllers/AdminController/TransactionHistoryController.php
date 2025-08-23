@@ -11,15 +11,40 @@ class TransactionHistoryController extends Controller
     /**
      * Display a listing of the resource.
      */
-   public function index()
-{
-    $transaction_histories = TransactionHistory::with('user')
-        ->orderBy('created_at', 'desc')
-        ->get();
+    public function index()
+    {
+        $transaction_histories = TransactionHistory::with('user')
+            ->orderBy('created_at', 'desc')
+            ->get();
 
-    return view('admin.pages.transaction_history.index', compact('transaction_histories'));
-}
 
+        return view('admin.pages.transaction_history.index', compact('transaction_histories'));
+    }
+
+
+    public function approve($id)
+    {
+        $transaction = TransactionHistory::findOrFail($id);
+        $transaction->update([
+            'payment_status' => 'approved',
+            'status' => 1,
+            'is_sent' => 1,
+        ]);
+
+        return back()->with('success', 'Withdrawal approved and marked as sent!');
+    }
+
+    public function reject($id)
+    {
+        $transaction = TransactionHistory::findOrFail($id);
+        $transaction->update([
+            'payment_status' => 'pending', // Or maybe 'rejected' if you add that
+            'status' => 0,
+            'is_sent' => 0,
+        ]);
+
+        return back()->with('error', 'Withdrawal rejected!');
+    }
     /**
      * Show the form for creating a new resource.
      */

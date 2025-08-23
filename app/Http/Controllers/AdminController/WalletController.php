@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\AdminController;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class WalletController extends Controller
@@ -12,7 +13,8 @@ class WalletController extends Controller
      */
     public function index()
     {
-        return view('admin.pages.wallet.index');
+        $user = auth()->user();
+        return view('admin.pages.wallet.index', compact('user'));
     }
 
     /**
