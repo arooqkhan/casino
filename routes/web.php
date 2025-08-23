@@ -34,6 +34,13 @@ Route::middleware('auth')->group(function () {
 
      Route::resource('wallet', WalletController::class);
 
+
+
+     Route::prefix('wallet')->name('wallet.')->group(function () {
+    Route::post('/add-money', [WalletController::class, 'addMoney'])->name('add.money');
+     Route::post('/withdraw-money', [WalletController::class, 'withdrawMoney'])->name('withdraw.money');
+});
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
