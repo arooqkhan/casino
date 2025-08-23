@@ -25,7 +25,7 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 <div class="col-lg-12">
-<h4 class="m-2 mt-4">Users</h4>
+    <h4 class="m-2 mt-4">Users</h4>
 
     <div class="statbox widget box box-shadow">
         @if(session('success'))
@@ -65,75 +65,75 @@
         </script>
         @endif
         <div class="widget-content widget-content-area">
-            
+
             <a href="{{ route('users.create') }}" class="btn btn-success m-2">Add User</a>
-          
+
             <table id="style-2" class="table style-2 dt-table-hover">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>User Email</th>
-            <th>Address</th>
-            <th>DOB</th>
-      
-            <th class="text-center">Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @forelse($users as $user)
-        <tr>
-            <td>{{ $user->id }}</td>
-            <td>
-                <span>
-                    @if($user->image)
-                    <img src="{{ asset($user->image) }}" class="rounded-circle profile-img" alt="user Image" style="width: 50px; height: 50px; margin-right: 10px;">
-                    @else
-                    <img src="{{ asset('images/dummy.jpg') }}" class="rounded-circle profile-img" alt="user Image" style="width: 50px; height: 50px; margin-right: 10px;">
-                    @endif
-                </span>
-                {{ $user->first_name }} {{ $user->last_name }}
-            </td>
-            <td>{{ $user->email }}</td>
-            <td>{{ $user->address }}</td>
-            <td>{{ $user->dob }}</td>
-           
-            <td class="text-center">
- 
-    <a href="{{ route('users.edit', $user->id) }}" class="btn btn-primary btn-sm">
-        <i class="fas fa-edit"></i>
-    </a>
-    
-<form action="{{ route('users.destroy', $user->id) }}" method="POST" style="display:inline;" class="delete-form">
-    @csrf
-    @method('DELETE')
-    <button type="submit" class="btn btn-danger btn-sm delete-btn">
-        <i class="fas fa-trash-alt"></i>
-    </button>
-</form>
-    <button type="button" class="btn btn-info btn-sm view-details-btn" data-toggle="modal" data-target="#viewDetailsModal" data-user="{{ json_encode($user) }}">
-        <i class="fas fa-eye"></i>
-    </button>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>User Email</th>
+                        <th>Address</th>
+                        <th>DOB</th>
 
-    
-   
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($users as $user)
+                    <tr>
+                        <td>{{ $user->id }}</td>
+                        <td>
+                            <span>
+                                @if($user->image)
+                                <img src="{{ asset($user->image) }}" class="rounded-circle profile-img" alt="user Image" style="width: 50px; height: 50px; margin-right: 10px;">
+                                @else
+                                <img src="{{ asset('images/dummy.jpg') }}" class="rounded-circle profile-img" alt="user Image" style="width: 50px; height: 50px; margin-right: 10px;">
+                                @endif
+                            </span>
+                            {{ $user->first_name }} {{ $user->last_name }}
+                        </td>
+                        <td>{{ $user->email }}</td>
+                        <td>{{ $user->address }}</td>
+                        <td>{{ $user->dob }}</td>
 
-   
-  
+                        <td class="text-center">
+
+                            <a href="{{ route('users.edit', $user->id) }}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-edit"></i>
+                            </a>
+
+                            <form action="{{ route('users.destroy', $user->id) }}" method="POST" style="display:inline;" class="delete-form">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger btn-sm delete-btn">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </form>
+                            <button type="button" class="btn btn-info btn-sm view-details-btn" data-toggle="modal" data-target="#viewDetailsModal" data-user="{{ json_encode($user) }}">
+                                <i class="fas fa-eye"></i>
+                            </button>
 
 
-    
 
-</td>
 
-        </tr>
-        @empty
-        <tr>
-            <td colspan="6" class="text-center">No user records found.</td>
-        </tr>
-        @endforelse
-    </tbody>
-</table>
+
+
+
+
+
+
+                        </td>
+
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="6" class="text-center">No user records found.</td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
