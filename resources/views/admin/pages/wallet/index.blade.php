@@ -408,41 +408,45 @@
 </div>
 
 <script>
-  // Eye toggle
+  // ---- Eye toggle ----
   const toggleEye = document.getElementById('toggleEye');
-  const eyeIcon = document.getElementById('eyeIcon');
-  const balance = document.getElementById('balance');
+  const eyeIcon   = document.getElementById('eyeIcon');
+  const balance   = document.getElementById('balance');
+
   let isVisible = true;
+  const originalBalance = "{{ number_format($user->balance, 2) }}"; // Laravel ka balance
+
   toggleEye.addEventListener('click', () => {
     isVisible = !isVisible;
     if (isVisible) {
-      balance.textContent = '1,234.43';
+      balance.textContent = originalBalance; // Show real balance
       eyeIcon.classList.remove('fa-eye-slash');
       eyeIcon.classList.add('fa-eye');
     } else {
-      balance.textContent = '******';
+      balance.textContent = '******'; // Hide balance
       eyeIcon.classList.remove('fa-eye');
       eyeIcon.classList.add('fa-eye-slash');
     }
   });
 
-  // ---- Add Money Modal ----
-  const openAddMoney = document.getElementById('openAddMoney');
-  const addMoneyModal = document.getElementById('addMoneyModal');
-  const closeAddMoney = document.getElementById('closeAddMoney');
-  const cancelAddMoney = document.getElementById('cancelAddMoney');
-  const addMoneyForm = document.getElementById('addMoneyForm');
-  const amountInput = document.getElementById('amount');
-
-  function openModal(modal, input) {
+  // ---- Modal Helper Functions ----
+  function openModal(modal, input = null) {
     modal.classList.add('active');
     if (input) input.focus();
   }
 
-  function closeModal(modal, form) {
+  function closeModal(modal, form = null) {
     modal.classList.remove('active');
     if (form) form.reset();
   }
+
+  // ---- Add Money Modal ----
+  const openAddMoney   = document.getElementById('openAddMoney');
+  const addMoneyModal  = document.getElementById('addMoneyModal');
+  const closeAddMoney  = document.getElementById('closeAddMoney');
+  const cancelAddMoney = document.getElementById('cancelAddMoney');
+  const addMoneyForm   = document.getElementById('addMoneyForm');
+  const amountInput    = document.getElementById('amount');
 
   openAddMoney.addEventListener('click', () => openModal(addMoneyModal, amountInput));
   closeAddMoney.addEventListener('click', () => closeModal(addMoneyModal, addMoneyForm));
@@ -453,7 +457,7 @@
 
   addMoneyForm.addEventListener('submit', function(e) {
     e.preventDefault();
-    const data = new FormData(addMoneyForm);
+    const data   = new FormData(addMoneyForm);
     const amount = parseFloat(data.get('amount') || '0');
     const method = data.get('method');
 
@@ -466,17 +470,17 @@
       return;
     }
 
-    // ✅ Now submit to Laravel (backend will handle success page)
+    // ✅ Laravel backend handle karega
     this.submit();
   });
 
   // ---- Withdraw Modal ----
-  const openWithdraw = document.getElementById('openWithdraw');
-  const withdrawModal = document.getElementById('withdrawModal');
-  const closeWithdraw = document.getElementById('closeWithdraw');
-  const cancelWithdraw = document.getElementById('cancelWithdraw');
-  const withdrawForm = document.getElementById('withdrawForm');
-  const withdrawAmount = document.getElementById('withdrawAmount');
+  const openWithdraw    = document.getElementById('openWithdraw');
+  const withdrawModal   = document.getElementById('withdrawModal');
+  const closeWithdraw   = document.getElementById('closeWithdraw');
+  const cancelWithdraw  = document.getElementById('cancelWithdraw');
+  const withdrawForm    = document.getElementById('withdrawForm');
+  const withdrawAmount  = document.getElementById('withdrawAmount');
 
   openWithdraw.addEventListener('click', () => openModal(withdrawModal, withdrawAmount));
   closeWithdraw.addEventListener('click', () => closeModal(withdrawModal, withdrawForm));
@@ -487,9 +491,10 @@
 
   withdrawForm.addEventListener('submit', function(e) {
     e.preventDefault();
-    const data = new FormData(withdrawForm);
+    const data   = new FormData(withdrawForm);
     const amount = parseFloat(data.get('amount') || '0');
     const method = data.get('method');
+
     if (!amount || amount <= 0) {
       alert('Enter valid amount.');
       return;
@@ -498,11 +503,12 @@
       alert('Select withdrawal method.');
       return;
     }
-    alert(`Withdraw Money\nAmount: $${amount.toFixed(2)}\nMethod: ${method}`);
-    closeModal(withdrawModal, withdrawForm);
+
+    // ✅ Laravel backend handle karega
+    this.submit();
   });
 
-  // Escape key close
+  // ---- Escape key close ----
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       if (addMoneyModal.classList.contains('active')) closeModal(addMoneyModal, addMoneyForm);
@@ -510,5 +516,6 @@
     }
   });
 </script>
+
 
 @endsection

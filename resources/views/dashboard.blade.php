@@ -1,281 +1,283 @@
 @extends('admin.master.main')
 
 @section('content')
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Poppins', sans-serif;
+    }
 
-        body {
-            background-color: #f5f7fa;
-            color: #333;
-            padding: 20px;
-        }
+    body {
+        background-color: #f5f7fa;
+        color: #333;
+        padding: 20px;
+    }
 
-        .container-fluid {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+    .container-fluid {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
 
-        .dashboard-header {
-            margin-bottom: 30px;
-        }
+    .dashboard-header {
+        margin-bottom: 30px;
+    }
 
-        .dashboard-header h1 {
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 5px;
-        }
+    .dashboard-header h1 {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 5px;
+    }
 
-        .dashboard-header p {
-            color: #7f8c8d;
-        }
+    .dashboard-header p {
+        color: #7f8c8d;
+    }
 
-        .row {
-            display: flex;
-            flex-wrap: wrap;
-            margin: 0 -15px 30px -15px;
-        }
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+        margin: 0 -15px 30px -15px;
+    }
 
+    .card {
+        flex: 1;
+        min-width: 250px;
+        margin: 0 15px 30px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        padding: 25px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .card-title {
+        font-size: 16px;
+        font-weight: 500;
+        color: #7f8c8d;
+    }
+
+    .card-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+    }
+
+    .card-content {
+        margin-top: 15px;
+    }
+
+    .card-value {
+        font-size: 28px;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+
+    .card-change {
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+    }
+
+    .up {
+        color: #2ecc71;
+    }
+
+    .down {
+        color: #e74c3c;
+    }
+
+    .graph-container {
+        background: #191e3a;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        padding: 25px;
+        margin: 0 15px;
+        width: calc(100% - 30px);
+    }
+
+    .graph-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+    }
+
+    .graph-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #2c3e50;
+    }
+
+
+
+    .chart-container {
+        position: relative;
+        height: 300px;
+        width: 100%;
+    }
+
+    .stats-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin-top: 20px;
+    }
+
+    .stat-item {
+        flex: 1;
+        min-width: 200px;
+        display: flex;
+        flex-direction: column;
+        padding: 15px;
+        background: #191e3a;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+    }
+
+    .stat-label {
+        font-size: 14px;
+        color: #7f8c8d;
+        margin-bottom: 8px;
+    }
+
+    .stat-value {
+        font-size: 22px;
+        font-weight: 600;
+        color: #2c3e50;
+    }
+
+    .third-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 25px;
+    }
+
+    .activity-card,
+    .progress-card {
+        background: #191e3a;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        padding: 25px;
+    }
+
+    .card-heading {
+        font-size: 18px;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .activity-item {
+        display: flex;
+        margin-bottom: 20px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #f1f1f1;
+    }
+
+    .activity-item:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+    }
+
+    .activity-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        font-size: 16px;
+        color: white;
+    }
+
+    .activity-details {
+        flex: 1;
+    }
+
+    .activity-title {
+        font-weight: 500;
+        margin-bottom: 5px;
+    }
+
+    .activity-time {
+        font-size: 13px;
+        color: #7f8c8d;
+    }
+
+    .progress-item {
+        margin-bottom: 25px;
+    }
+
+    .progress-info {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+    }
+
+    .progress-label {
+        font-size: 14px;
+        color: #2c3e50;
+    }
+
+    .progress-percentage {
+        font-size: 14px;
+        font-weight: 500;
+        color: #3498db;
+    }
+
+    .progress-bar {
+        height: 8px;
+        background: #f1f1f1;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .progress-fill {
+        height: 100%;
+        border-radius: 4px;
+    }
+
+    @media (max-width: 992px) {
+        .third-row {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 768px) {
         .card {
-            flex: 1;
-            min-width: 250px;
-            margin: 0 15px 30px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            padding: 25px;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .card-title {
-            font-size: 16px;
-            font-weight: 500;
-            color: #7f8c8d;
-        }
-
-        .card-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-        }
-
-        .card-content {
-            margin-top: 15px;
-        }
-
-        .card-value {
-            font-size: 28px;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-
-        .card-change {
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-        }
-
-        .up {
-            color: #2ecc71;
-        }
-
-        .down {
-            color: #e74c3c;
-        }
-
-        .graph-container {
-            background: #191e3a;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            padding: 25px;
-            margin: 0 15px;
-            width: calc(100% - 30px);
-        }
-
-        .graph-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-        }
-
-        .graph-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #2c3e50;
-        }
-
-       
-
-        .chart-container {
-            position: relative;
-            height: 300px;
-            width: 100%;
+            min-width: 100%;
         }
 
         .stats-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .stat-item {
-            flex: 1;
-            min-width: 200px;
-            display: flex;
             flex-direction: column;
-            padding: 15px;
-            background: #191e3a;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
         }
-
-        .stat-label {
-            font-size: 14px;
-            color: #7f8c8d;
-            margin-bottom: 8px;
-        }
-
-        .stat-value {
-            font-size: 22px;
-            font-weight: 600;
-            color: #2c3e50;
-        }
-
-        .third-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 25px;
-        }
-
-        .activity-card, .progress-card {
-            background: #191e3a;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            padding: 25px;
-        }
-
-        .card-heading {
-            font-size: 18px;
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #eee;
-        }
-
-        .activity-item {
-            display: flex;
-            margin-bottom: 20px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #f1f1f1;
-        }
-
-        .activity-item:last-child {
-            margin-bottom: 0;
-            padding-bottom: 0;
-            border-bottom: none;
-        }
-
-        .activity-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 15px;
-            font-size: 16px;
-            color: white;
-        }
-
-        .activity-details {
-            flex: 1;
-        }
-
-        .activity-title {
-            font-weight: 500;
-            margin-bottom: 5px;
-        }
-
-        .activity-time {
-            font-size: 13px;
-            color: #7f8c8d;
-        }
-
-        .progress-item {
-            margin-bottom: 25px;
-        }
-
-        .progress-info {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-        }
-
-        .progress-label {
-            font-size: 14px;
-            color: #2c3e50;
-        }
-
-        .progress-percentage {
-            font-size: 14px;
-            font-weight: 500;
-            color: #3498db;
-        }
-
-        .progress-bar {
-            height: 8px;
-            background: #f1f1f1;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            border-radius: 4px;
-        }
-
-        @media (max-width: 992px) {
-            .third-row {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .card {
-                min-width: 100%;
-            }
-            
-            .stats-container {
-                flex-direction: column;
-            }
-        }
-    </style>
+    }
+</style>
 </head>
+
 <body>
     <div class="container-fluid">
         <!-- Dashboard Header -->
@@ -288,70 +290,72 @@
         <div class="row">
             <div class="card">
                 <div class="card-header">
-                    <div class="card-title">TOTAL REVENUE</div>
+                    <div class="card-title">Total Balance</div>
                     <div class="card-icon" style="background-color: rgba(52, 152, 219, 0.1); color: #3498db;">
                         <i>💰</i>
                     </div>
                 </div>
                 <div class="card-content">
-                    <div class="card-value">$24,267</div>
-                    <div class="card-change up">+12.5% from last week</div>
+                    <div class="card-value">${{$totalamount}}</div>
                 </div>
             </div>
-            
+
             <div class="card">
                 <div class="card-header">
-                    <div class="card-title">PENDING PAYMENTS</div>
+                    <div class="card-title">Withdraw PAYMENTS</div>
                     <div class="card-icon" style="background-color: rgba(243, 156, 18, 0.1); color: #f39c12;">
                         <i>⏱️</i>
                     </div>
                 </div>
                 <div class="card-content">
-                    <div class="card-value">$3,875</div>
-                    <div class="card-change down">-3.2% from last week</div>
+                    <div class="card-value">${{$withdrawamount}}</div>
+
                 </div>
             </div>
-            
+
             <div class="card">
                 <div class="card-header">
-                    <div class="card-title">COMPLETED PAYMENTS</div>
+                    <div class="card-title">Deposit PAYMENTS</div>
                     <div class="card-icon" style="background-color: rgba(46, 204, 113, 0.1); color: #2ecc71;">
                         <i>✅</i>
                     </div>
                 </div>
                 <div class="card-content">
-                    <div class="card-value">$18,492</div>
-                    <div class="card-change up">+8.7% from last week</div>
+                    <div class="card-value">${{$depositamount}}</div>
+
                 </div>
             </div>
         </div>
 
         <!-- Second Row: Graph -->
-        <div class="row">
-            <div class="graph-container">
-                <div class="graph-header">
-                    <div class="graph-title">Payment Overview</div>
-                    
-                </div>
-                <div class="chart-container">
-                    <canvas id="paymentChart"></canvas>
-                </div>
-                <div class="stats-container">
-                    <div class="stat-item">
-                        <span class="stat-label">Average Daily Revenue</span>
-                        <span class="stat-value">$1,245</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Payment Success Rate</span>
-                        <span class="stat-value">97.8%</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Refund Rate</span>
-                        <span class="stat-value">2.2%</span>
-                    </div>
-                </div>
+      <div class="row">
+    <div class="graph-container">
+        <div class="graph-header">
+            <div class="graph-title">Payment Overview</div>
+        </div>
+
+        <!-- Chart -->
+        <div class="chart-container">
+            <canvas id="paymentChart"></canvas>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-container">
+            <div class="stat-item">
+                <span class="stat-label">Total Balance</span>
+                <span class="stat-value">${{ number_format($totalamount, 2) }}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Withdraw Balance</span>
+                <span class="stat-value">${{ number_format($withdrawamount, 2) }}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Deposit Balance</span>
+                <span class="stat-value">${{ number_format($depositamount, 2) }}</span>
             </div>
         </div>
+    </div>
+</div>
 
         <!-- Third Row: Additional Content -->
         <div class="third-row">
@@ -388,7 +392,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="progress-card">
                 <div class="card-heading">Payment Goals</div>
                 <div class="progress-list">
@@ -436,14 +440,13 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const ctx = document.getElementById('paymentChart').getContext('2d');
-            
+
             // Sample data for the chart
             const paymentChart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                    datasets: [
-                        {
+                    datasets: [{
                             label: 'Revenue',
                             data: [1850, 2150, 2400, 2780, 2390, 3150, 3450],
                             backgroundColor: 'rgba(52, 152, 219, 0.1)',
@@ -489,4 +492,4 @@
         });
     </script>
 
-@endsection
+    @endsection

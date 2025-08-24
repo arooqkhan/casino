@@ -109,3 +109,43 @@
 
         multiCheck(c3);
     </script>
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const ctx = document.getElementById('paymentChart').getContext('2d');
+
+new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: @json($chartLabels ?? []),
+    datasets: [
+      {
+        label: 'Deposits',
+        data: @json($depositData ?? []),
+        borderColor: '#2ecc71',
+        backgroundColor: 'rgba(46, 204, 113, 0.2)',
+        fill: true,
+        tension: 0.3
+      },
+      {
+        label: 'Withdrawals',
+        data: @json($withdrawData ?? []),
+        borderColor: '#e74c3c',
+        backgroundColor: 'rgba(231, 76, 60, 0.2)',
+        fill: true,
+        tension: 0.3
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { display: true, position: 'top' } },
+    interaction: { mode: 'index', intersect: false },
+    scales: { y: { beginAtZero: true } }
+  }
+});
+</script>
+

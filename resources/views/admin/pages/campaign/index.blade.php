@@ -77,10 +77,9 @@
                     <tr>
                         <th>ID</th>
                         <th>Name</th>
-                        <th>Status</th>
                         <th>Start At</th>
                         <th>End At</th>
-                        <th>Countdown End</th>
+                        <th>Status</th>
                         <th class="text-center">Actions</th>
                     </tr>
                 </thead>
@@ -89,10 +88,18 @@
                     <tr>
                         <td>{{ $campaign->id }}</td>
                         <td>{{ $campaign->name }}</td>
-                        <td>{{ ucfirst($campaign->status) }}</td>
                         <td>{{ $campaign->start_at ? \Carbon\Carbon::parse($campaign->start_at)->format('Y-m-d h:i') : '-' }}</td>
                         <td>{{ $campaign->end_at ? \Carbon\Carbon::parse($campaign->end_at)->format('Y-m-d h:i') : '-' }}</td>
-                        <td>{{ $campaign->countdown_end ? \Carbon\Carbon::parse($campaign->countdown_end)->format('Y-m-d h:i') : '-' }}</td>
+                        <td>
+                            @if($campaign->status == 'active')
+                                <span class="badge bg-success">Active</span>
+                            @elseif($campaign->status == 'upcoming')
+                                <span class="badge bg-primary">Upcoming</span>
+                            @elseif($campaign->status == 'expired')
+                                <span class="badge bg-danger">Expired</span>
+                            @endif
+                        </td>
+                       
 
                         <td class="text-center">
                             <a href="{{ route('campaigns.edit', $campaign->id) }}" class="btn btn-primary btn-sm">

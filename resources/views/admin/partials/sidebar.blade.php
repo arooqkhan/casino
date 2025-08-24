@@ -6,11 +6,11 @@
             <div class="nav-logo">
                 <div class="">
                     <a href="{{url('/')}}">
-                        <img src="{{ asset('images/logo.svg') }}" class="" alt="logo" id="testLogo">
+                        <img src="{{ asset('1.png') }}" style="width: 50px; height:50px; border-radius:50%;" class="" alt="logo" id="testLogo">
                     </a>
                 </div>
                 <div class="nav-item theme-text">
-                    <a href="{{url('/')}}" class="nav-link">AiSearch</a>
+                    <a href="{{url('/')}}" class="nav-link">Casino</a>
                 </div>
             </div>
             <div class="nav-item sidebar-toggle">
@@ -25,10 +25,10 @@
         <div class="profile-info">
             <div class="user-info">
                 <div class="profile-img">
-                    <img src="{{asset('2.png')}}" alt="avatar">
+                    <img src="{{ asset(auth()->user()->image ? asset(auth()->user()->image) : asset('1.png')) }}" alt="avatar">
                 </div>
                 <div class="profile-content">
-                    <h6 class="">Admin</h6>
+                    <h6 class="">{{auth()->user()->first_name}}</h6>
                     <p class="">Project Leader</p>
                 </div>
             </div>
@@ -83,7 +83,7 @@
             </li>
 
 
-            <!-- Transaction Histories -->
+            <!-- Transaction -->
 
             <li class="menu {{ request()->routeIs('transaction_histories.*') ? 'active' : '' }}">
                 <a href="{{ route('transaction_histories.index') }}" class="dropdown-toggle">
@@ -99,7 +99,7 @@
                             <line x1="7" y1="21" x2="17" y2="11"></line>
                             <polyline points="17 21 17 11 7 11"></polyline>
                         </svg>
-                        <span>Transaction Histories</span>
+                        <span>Transaction</span>
                     </div>
                 </a>
             </li>

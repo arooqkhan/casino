@@ -25,7 +25,7 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 <div class="col-lg-12">
-    <h4 class="m-2 mt-4">TransactionHistory</h4>
+    <h4 class="m-2 mt-4">Transaction</h4>
 
     <div class="statbox widget box box-shadow">
         @if(session('success'))
