@@ -25,7 +25,7 @@
         <div class="profile-info">
             <div class="user-info">
                 <div class="profile-img">
-                    <img src="{{asset('admin-assets/src/assets/img/profile-30.png')}}" alt="avatar">
+                    <img src="{{asset('2.png')}}" alt="avatar">
                 </div>
                 <div class="profile-content">
                     <h6 class="">Admin</h6>
@@ -37,7 +37,7 @@
         <div class="shadow-bottom"></div>
         <ul class="list-unstyled menu-categories" id="accordionExample">
             <li class="menu {{ request()->routeIs('dashboard') ? 'active' : '' }}">
-                <a href="" class="dropdown-toggle">
+                <a href="{{url('/')}}" class="dropdown-toggle">
                     <div>
                         <!-- Dashboard icon (meter-style) -->
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -147,7 +147,7 @@
             </li>
 
 
-            <!-- Created -->
+            <!-- Card Details -->
 
             <li class="menu {{ request()->routeIs('createds.*') ? 'active' : '' }}">
                 <a href="{{ route('createds.index') }}" class="dropdown-toggle">
@@ -162,7 +162,7 @@
                             <line x1="12" y1="18" x2="12" y2="12"></line>
                             <line x1="9" y1="15" x2="15" y2="15"></line>
                         </svg>
-                        <span>Created</span>
+                        <span>Card Detail</span>
                     </div>
                 </a>
             </li>

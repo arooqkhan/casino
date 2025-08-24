@@ -107,7 +107,7 @@
                             <form action="{{ route('admin.transactions.reject', $transaction->id) }}" method="POST" style="display:inline;">
                                 @csrf
                                 <button type="submit" class="btn btn-danger btn-sm" title="Reject">
-                                    <!-- <i class="fas fa-times"></i> -->
+                                  <input type="hidden" value="{{$transaction->amount}}" name="amount">
                                      Rejected
                                 </button>
                             </form>
