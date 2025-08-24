@@ -1,13 +1,14 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminController\UserController;
 use App\Http\Controllers\AdminController\BonusController;
 use App\Http\Controllers\AdminController\WalletController;
 use App\Http\Controllers\AdminController\CreatedController;
 use App\Http\Controllers\AdminController\CampaignController;
-use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\AdminController\UserProfileController;
 use App\Http\Controllers\AdminController\TransactionHistoryController;
 
 // Route::get('/', function () {
@@ -42,6 +43,11 @@ Route::middleware('auth')->group(function () {
         Route::post('/withdraw-money', [WalletController::class, 'withdrawMoney'])->name('withdraw.money');
     });
 
+
+   Route::get('userprofile', [UserProfileController::class, 'edit'])->name('userprofile');
+   Route::put('userprofile', [UserProfileController::class, 'update'])->name('userprofile.update');
+
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -58,6 +64,9 @@ Route::prefix('admin')->middleware(['auth',])->group(function () {
         ->name('admin.transactions.reject');
     // Route::delete('/transactions/{id}', [TransactionHistoryController::class, 'destroy'])->name('admin.transactions.destroy');
 });
+
+
+
 // Route::get('/payment', [PaymentController::class, 'index'])->name('payment.form');
 // Route::post('/checkout', [PaymentController::class, 'checkout'])->name('payment.checkout');
 // Route::get('/success', function () {

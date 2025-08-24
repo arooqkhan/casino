@@ -34,8 +34,7 @@
                 Swal.fire({
                     position: 'bottom-end',
                     icon: 'success',
-                    title: '{{ session('
-                    success ') }}',
+                    title: '{{ session('success') }}',
                     showConfirmButton: false,
                     timer: 3000,
                     toast: true,
@@ -53,8 +52,7 @@
                 Swal.fire({
                     position: 'bottom-end',
                     icon: 'error',
-                    title: '{{ session('
-                    error ') }}',
+                    title: '{{ session('error') }}',
                     showConfirmButton: false,
                     timer: 3000,
                     toast: true,
@@ -100,20 +98,25 @@
                         <td>{{ $transaction->trans_type ?? '-' }}</td>
                         <td>{{ $transaction->created_at->format('d-m-Y') }}</td>
                         <td>
-                            @if($transaction->type === 'withdraw' && $transaction->status == 0)
-                            <form action="{{ route('admin.transactions.approve', $transaction->id) }}" method="POST">
+                            @if($transaction->type === 'withdraw')
+                            @if($transaction->status == 0)
+                            <form action="{{ route('admin.transactions.approve', $transaction->id) }}" method="POST" style="display:inline;">
                                 @csrf
-                                <button type="submit" class="btn btn-success">Approve</button>
+                                <button type="submit" class="btn btn-success btn-sm">Approve</button>
                             </form>
                             <form action="{{ route('admin.transactions.reject', $transaction->id) }}" method="POST" style="display:inline;">
                                 @csrf
-                                <button type="submit" class="btn btn-warning btn-sm btn-circle" title="Reject">
-                                    <i class="fas fa-times"></i>
+                                <button type="submit" class="btn btn-danger btn-sm" title="Reject">
+                                    <!-- <i class="fas fa-times"></i> -->
+                                     Rejected
                                 </button>
                             </form>
+                            @elseif($transaction->status == 1)
+                            <span class="badge bg-success">Approved</span>
+                            @elseif($transaction->status == 2)
+                            <span class="badge bg-danger">Rejected</span>
                             @endif
-
-
+                            @endif
                         </td>
                     </tr>
                     @empty

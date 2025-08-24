@@ -24,6 +24,8 @@ class TransactionHistoryController extends Controller
 
     public function approve($id)
     {
+
+     
         $transaction = TransactionHistory::findOrFail($id);
         $transaction->update([
             'payment_status' => 'approved',
@@ -36,11 +38,12 @@ class TransactionHistoryController extends Controller
 
     public function reject($id)
     {
+        
         $transaction = TransactionHistory::findOrFail($id);
         $transaction->update([
             'payment_status' => 'pending', // Or maybe 'rejected' if you add that
-            'status' => 0,
-            'is_sent' => 0,
+            'status' => 2,
+            'is_sent' => 2,
         ]);
 
         return back()->with('error', 'Withdrawal rejected!');
