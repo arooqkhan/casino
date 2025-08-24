@@ -8,18 +8,16 @@ use App\Http\Controllers\AdminController\BonusController;
 use App\Http\Controllers\AdminController\WalletController;
 use App\Http\Controllers\AdminController\CreatedController;
 use App\Http\Controllers\AdminController\CampaignController;
+use App\Http\Controllers\AdminController\DashboardController;
 use App\Http\Controllers\AdminController\UserProfileController;
 use App\Http\Controllers\AdminController\TransactionHistoryController;
 
-// Route::get('/', function () {
-//     return view('dashboard');
-// });
 
-Route::get('/', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
+    
+    Route::get('/', [DashboardController::class, 'dashboard'])->name('dashboard');
+
 
 
     Route::resource('users', UserController::class);

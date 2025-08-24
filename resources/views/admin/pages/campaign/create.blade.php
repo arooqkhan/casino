@@ -59,14 +59,14 @@
                             @enderror
                         </div>
 
-                        <div class="col-sm-4">
+                        <!-- <div class="col-sm-4">
                             <label for="countdown_end">Countdown End</label>
                             <input type="datetime-local" name="countdown_end" id="countdown_end" 
                                    class="form-control" value="{{ old('countdown_end') }}">
                             @error('countdown_end')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
-                        </div>
+                        </div> -->
                     </div>
 
                     <div class="row mb-4">

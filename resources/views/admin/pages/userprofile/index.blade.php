@@ -3,11 +3,30 @@
 @section('content')
 <div class="container mt-5">
   <div class="card shadow-lg p-4" style="max-width: 600px; margin: auto;">
-    <h3 class="mb-4">Update Profile</h3>
+    <h3 class="mb-4 text-center">Update Profile</h3>
 
     <form action="{{ route('userprofile.update') }}" method="POST" enctype="multipart/form-data">
       @csrf
       @method('PUT')
+
+      <!-- Profile Image Top Center -->
+      <div class="d-flex justify-content-center mb-4">
+        <div class="position-relative" style="width: 150px; height: 150px;">
+          <img id="profilePreview"
+               src="{{ auth()->user()->image ? asset(auth()->user()->image) : asset('1.png') }}"
+               alt="Profile Image"
+               class="rounded-circle shadow img-fluid"
+               style="width: 150px; height: 150px; object-fit: cover;">
+
+          <!-- Camera Icon Overlay -->
+          <label for="image"
+                 class="position-absolute bottom-0 end-0 bg-primary text-white rounded-circle d-flex justify-content-center align-items-center shadow"
+                 style="width: 40px; height: 40px; cursor: pointer;">
+            <i class="bi bi-camera"></i>
+          </label>
+          <input type="file" id="image" name="image" class="d-none" accept="image/*">
+        </div>
+      </div>
 
       <!-- First Name -->
       <div class="mb-3">
@@ -42,28 +61,26 @@
           required>
       </div>
 
-      <!-- Profile Image -->
-  <div class="mb-3">
-    <label for="image" class="form-label">Profile Image</label>
-    <input type="file"
-        class="form-control"
-        id="image"
-        name="image">
-
-    @if(auth()->user()->image)
-        <div class="mt-3">
-            <!-- Full Image -->
-            <p><strong>Full Image:</strong></p>
-            <img src="{{ asset(auth()->user()->image) }}"
-                alt="Full Profile Image"
-                class="img-fluid rounded shadow">
-        </div>
-    @endif
-</div>
-
       <!-- Submit Button -->
-      <button type="submit" class="btn btn-primary">Update Profile</button>
+      <button type="submit" class="btn btn-primary w-100">Update Profile</button>
     </form>
   </div>
 </div>
+
+<!-- Bootstrap Icons CDN -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+<!-- Live Preview Script -->
+<script>
+  document.getElementById('image').addEventListener('change', function (e) {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function (event) {
+        document.getElementById('profilePreview').setAttribute('src', event.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+</script>
 @endsection
