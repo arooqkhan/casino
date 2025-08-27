@@ -21,15 +21,15 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
         // Profile routes
         Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
 
-        Route::post('/register', [ProfileController::class, 'register'])->name('profile.register');
-
         
-          Route::get('/bonus', [ApiBonusController::class, 'index'])->name('bonus.index');
-           Route::get('/campaigns', [ApiCampaignController::class, 'index'])->name('campaigns.index');
-    });
-
-    // Public routes (no auth required) can be added here
-
+        
+      });
+      
+      Route::get('/bonus', [ApiBonusController::class, 'index'])->name('bonus.index');
+      Route::get('/campaigns', [ApiCampaignController::class, 'index'])->name('campaigns.index');
+      // Public routes (no auth required) can be added here
+      
+      Route::post('/register', [ProfileController::class, 'register'])->name('profile.register');
        Route::post('/login', [ProfileController::class, 'login'])->name('profile.login');
 
        
