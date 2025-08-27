@@ -1,11 +1,19 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan;
+use App\Http\Controllers\Api\ProfileController;
+use App\Http\Controllers\Api\ApiBonusController;
+use App\Http\Controllers\Api\ApiCampaignController;
+use App\Http\Controllers\AdminController\CampaignController;
+
+
+
 
 Route::prefix('v1')->name('api.v1.')->group(function () {
+
+ 
 
     // Authenticated routes
     Route::middleware('auth:sanctum')->group(function () {
@@ -13,10 +21,17 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
         // Profile routes
         Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
 
-        // Add more authenticated routes here
-        // e.g., Route::get('/bonus', [BonusController::class, 'index'])->name('bonus.index');
+        Route::post('/register', [ProfileController::class, 'register'])->name('profile.register');
+
+        
+          Route::get('/bonus', [ApiBonusController::class, 'index'])->name('bonus.index');
+           Route::get('/campaigns', [ApiCampaignController::class, 'index'])->name('campaigns.index');
     });
 
     // Public routes (no auth required) can be added here
-    // e.g., Route::post('/login', [AuthController::class, 'login'])->name('login');
+
+       Route::post('/login', [ProfileController::class, 'login'])->name('profile.login');
+
+       
 });
+
