@@ -2,36 +2,23 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Artisan;
-use App\Http\Controllers\Api\ProfileController;
-use App\Http\Controllers\Api\ApiBonusController;
-use App\Http\Controllers\Api\ApiCampaignController;
-use App\Http\Controllers\AdminController\CampaignController;
-
-
-
+use App\Http\Controllers\Api\AuthController; // make sure this exists
 
 Route::prefix('v1')->group(function () {
 
- 
+  // Public route
+  Route::post('/login', [AuthController::class, 'login']);
 
-    // Authenticated routes
-    Route::middleware('auth:sanctum')->group(function () {
+  // Authenticated routes
+  Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/user', function (Request $request) {
+      return $request->user();
+    });
+    Route::post('/logout', [AuthController::class, 'logout']);
+  });
 
-        // Profile routes
-        Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
-
-        
-        
-      });
-      
-      Route::get('/bonus', [ApiBonusController::class, 'index'])->name('bonus.index');
-      Route::get('/campaigns', [ApiCampaignController::class, 'index'])->name('campaigns.index');
-      // Public routes (no auth required) can be added here
-      
-      Route::post('/register', [ProfileController::class, 'register'])->name('profile.register');
-       Route::post('/login', [ProfileController::class, 'login'])->name('profile.login');
-
-       
+  // Test ping route
+  Route::get('/ping', function () {
+    return response()->json(['message' => 'pong']);
+  });
 });
-

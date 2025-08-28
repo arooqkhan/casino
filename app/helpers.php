@@ -1,13 +1,22 @@
 <?php
 
+use Illuminate\Support\Facades\Log;
 
-function ApiResponse($status = true, $message = '', $data = null, $code = 200)
-{
-    return response()->json([
-        'success' => $status,
-        'message' => $message,
-        'data' => $data
-    ], $code);
+if (!function_exists('ApiResponse')) {
+    function ApiResponse($success, $message, $data = null, $status = 200)
+    {
+
+        Log::info("API Response", [
+            'status' => $status,
+            'success' => $success,
+            'message' => $message,
+        ]);
+        return response()->json([
+            'success' => $success,
+            'message' => $message,
+            'data'    => $data,
+        ], $status);
+    }
 }
 
 
