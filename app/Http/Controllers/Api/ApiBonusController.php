@@ -3,20 +3,23 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\Bonus;
+use App\Helpers\ApiHelper;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
 class ApiBonusController extends Controller
 {
-    public function index(Request $request)
-    {
-        try {
-            $bonuses = Bonus::all(); // or use pagination: Bonus::paginate(10);
+   public function index(Request $request)
+{
+    try {
+        // agar tumhe pagination chahiye to:
+        // $bonuses = Bonus::paginate(10);
+        $bonuses = Bonus::all();
 
-            return ApiResponse(true, "Bonus list retrieved successfully", $bonuses, 200);
+        return ApiHelper::sendResponse(true, "Bonus list retrieved successfully", $bonuses, 200);
 
-        } catch (\Exception $e) {
-            return ApiResponse(false, "Something went wrong", $e->getMessage(), 500);
-        }
+    } catch (\Exception $e) {
+        return ApiHelper::sendResponse(false, "Something went wrong", $e->getMessage(), 500);
     }
+}
 }
