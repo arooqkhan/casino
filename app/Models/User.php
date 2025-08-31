@@ -57,4 +57,14 @@ class User extends Authenticatable
     {
         return $this->belongsTo(User::class);
     }
+
+
+    public function packages()
+{
+    return $this->belongsToMany(Package::class, 'package_user')
+                ->withPivot('time') // extra column bhi access hoga
+                ->withTimestamps();  // created_at, updated_at
+}
+
+
 }

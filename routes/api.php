@@ -3,7 +3,9 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ApiBonusController;
+use App\Http\Controllers\Api\ApiPackageController;
 use App\Http\Controllers\Api\ApiCampaignController;
+use App\Http\Controllers\Api\ApiPackagePurchaseController;
 use App\Http\Controllers\Api\ProfileController; // make sure this exists
 
 Route::prefix('v1')->group(function () {
@@ -24,6 +26,17 @@ Route::prefix('v1')->group(function () {
       Route::get('/bonuses', [ApiBonusController::class, 'index']);
 
       Route::get('/campaigns', [ApiCampaignController::class, 'index']);
+
+      Route::get('/packages', [ApiPackageController::class, 'index']);
+
+
+
+      Route::post('/purchase-package', [ApiPackagePurchaseController::class, 'createCheckout']);
+      Route::get('/stripe/success', [ApiPackagePurchaseController::class, 'success']);
+      Route::get('/stripe/cancel', function () {
+          return response()->json(['success' => false, 'message' => 'Payment cancelled']);
+      });
+
 
     
   });

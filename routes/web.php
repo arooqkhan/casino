@@ -1,5 +1,6 @@
 <?php
 
+
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
@@ -7,12 +8,11 @@ use App\Http\Controllers\AdminController\UserController;
 use App\Http\Controllers\AdminController\BonusController;
 use App\Http\Controllers\AdminController\WalletController;
 use App\Http\Controllers\AdminController\CreatedController;
+use App\Http\Controllers\AdminController\PackageController;
 use App\Http\Controllers\AdminController\CampaignController;
 use App\Http\Controllers\AdminController\DashboardController;
 use App\Http\Controllers\AdminController\UserProfileController;
 use App\Http\Controllers\AdminController\TransactionHistoryController;
-
-
 
 Route::middleware('auth')->group(function () {
     
@@ -30,6 +30,8 @@ Route::middleware('auth')->group(function () {
 
 
     Route::resource('createds', CreatedController::class);
+
+    Route::resource('packages', PackageController::class);
 
 
     Route::resource('wallet', WalletController::class);
