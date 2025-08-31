@@ -168,6 +168,25 @@
             </li>
 
 
+            <!-- Pachages -->
+
+            <li class="menu {{ request()->routeIs('packages.*') ? 'active' : '' }}">
+                <a href="{{ route('packages.index') }}" class="dropdown-toggle">
+                    <div>
+                        <!-- Package / Box Icon -->
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            width="24" height="24" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round"
+                            class="feather feather-package">
+                            <path d="M16.5 9.4V4.2a1 1 0 0 0-.55-.9L12.2 1.5a1 1 0 0 0-1.05 0L8.05 3.3a1 1 0 0 0-.55.9v5.2M3 6.8l9 5.2 9-5.2M3 6.8v10.4a1 1 0 0 0 .55.9l7.65 4.4a1 1 0 0 0 1.05 0l7.65-4.4a1 1 0 0 0 .55-.9V6.8" />
+                        </svg>
+                        <span>Packages</span>
+                    </div>
+                </a>
+            </li>
+
+
 
             <!-- Wallet -->
 
@@ -190,18 +209,18 @@
 
 
 
-               <!-- User Profile -->
+            <!-- User Profile -->
 
-  <li class="menu {{ request()->routeIs('userprofile') ? 'active' : '' }}">
-    <a href="{{ route('userprofile') }}" class="dropdown-toggle">
-        <div>
-            <!-- Settings Icon -->
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                class="feather">
-                <circle cx="12" cy="12" r="3"></circle>
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33
+            <li class="menu {{ request()->routeIs('userprofile') ? 'active' : '' }}">
+                <a href="{{ route('userprofile') }}" class="dropdown-toggle">
+                    <div>
+                        <!-- Settings Icon -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="feather">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33
                          1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51
                          1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06
                          a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3
@@ -217,11 +236,11 @@
                          a1.65 1.65 0 0 0-.33 1.82V9
                          c0 .69.41 1.31 1.04 1.58
                          .64.27 1.38.11 1.89-.39z"></path>
-            </svg>
-            <span>Setting</span>
-        </div>
-    </a>
-</li>
+                        </svg>
+                        <span>Setting</span>
+                    </div>
+                </a>
+            </li>
 
 
 

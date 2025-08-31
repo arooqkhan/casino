@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\Bonus;
+use App\Models\Package;
 use App\Helpers\ApiHelper;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
-class ApiBonusController extends Controller
+class ApiPackageController extends Controller
 {
-   public function index(Request $request)
+      public function index(Request $request)
 {
     try {
         // agar tumhe pagination chahiye to:
         // $bonuses = Bonus::paginate(10);
-        $bonuses = Bonus::all();
+        $bonuses = Package::all();
 
         return ApiHelper::sendResponse(true, "Bonus list retrieved successfully", $bonuses, 200);
 
@@ -22,5 +22,4 @@ class ApiBonusController extends Controller
         return ApiHelper::sendResponse(false, "Something went wrong", $e->getMessage(), 500);
     }
 }
-
 }

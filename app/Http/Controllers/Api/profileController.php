@@ -46,7 +46,7 @@ public function show($id)
     return ApiHelper::sendResponse(true, "User retrieved successfully", $userData, 200);
 }
 
-    public function register(Request $request)
+public function register(Request $request)
 {
     // ✅ Validation via ApiHelper
     $validation = ApiHelper::validate($request->all(), [
@@ -63,6 +63,7 @@ public function show($id)
     }
 
     try {
+        // ✅ Create user
         $user = User::create([
             'first_name' => $request->first_name,
             'last_name'  => $request->last_name,
@@ -72,18 +73,26 @@ public function show($id)
             'password'   => Hash::make($request->password),
         ]);
 
-        return ApiHelper::sendResponse(true, "User registered successfully", $user, 201);
+        // ✅ Generate token
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        // ✅ Merge token with user data
+        $userData = $user->toArray();
+        $userData['token'] = $token;
+
+        return ApiHelper::sendResponse(true, "User registered successfully", $userData, 201);
 
     } catch (\Exception $e) {
         return ApiHelper::sendResponse(false, "Something went wrong", $e->getMessage(), 500);
     }
 }
 
-   public function login(Request $request)
+
+ public function login(Request $request)
 {
     Log::info("API Hit: /api/login", $request->only(['email']));
 
-    // ✅ Validation via Helper
+    // ✅ Validation
     $validation = ApiHelper::validate($request->all(), [
         'email'    => 'required|email',
         'password' => 'required|string|min:6',
@@ -105,13 +114,14 @@ public function show($id)
     // ✅ Token generate
     $token = $user->createToken('auth_token')->plainTextToken;
 
-    $data = [
-        'user'  => $user,
-        'token' => $token,
-    ];
+    // Merge token directly with user attributes
+    $userData = $user->toArray(); // convert Eloquent object to array
+    $userData['token'] = $token;
 
     Log::info("API Response: /api/login", ['status' => 200, 'user_id' => $user->id]);
 
-    return ApiHelper::sendResponse(true, 'Login successful', $data, 200);
+    return ApiHelper::sendResponse(true, 'Login successful', $userData, 200);
 }
+
+
 }
