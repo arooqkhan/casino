@@ -19,6 +19,7 @@ class ProfileController extends Controller
         $user = Auth::user();
 
         if (!$user) {
+
             return ApiHelper::sendResponse(false, "User not authenticated", null, 401);
         }
 
