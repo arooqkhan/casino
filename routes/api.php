@@ -19,29 +19,22 @@ Route::prefix('v1')->group(function () {
   Route::middleware('auth:sanctum')->group(function () {
 
 
-     Route::post('/list_profile', [ProfileController::class, 'index']);
+    Route::post('/list_profile', [ProfileController::class, 'index']);
 
-      Route::get('/user/{id}', [ProfileController::class, 'show']);
+    Route::get('/user/{id}', [ProfileController::class, 'show']);
 
-      Route::get('/bonuses', [ApiBonusController::class, 'index']);
+    Route::get('/bonuses', [ApiBonusController::class, 'index']);
 
-      Route::get('/campaigns', [ApiCampaignController::class, 'index']);
+    Route::get('/campaigns', [ApiCampaignController::class, 'index']);
 
-      Route::get('/packages', [ApiPackageController::class, 'index']);
-
-
-
-      Route::post('/purchase-package', [ApiPackagePurchaseController::class, 'createCheckout']);
-      Route::get('/stripe/success', [ApiPackagePurchaseController::class, 'success']);
-      Route::get('/stripe/cancel', function () {
-          return response()->json(['success' => false, 'message' => 'Payment cancelled']);
-      });
+    Route::get('/packages', [ApiPackageController::class, 'index']);
 
 
-    
+
+    Route::post('/purchase-package', [ApiPackagePurchaseController::class, 'createCheckout']);
+    Route::get('/stripe/success', [ApiPackagePurchaseController::class, 'success']);
+    Route::get('/stripe/cancel', function () {
+      return response()->json(['success' => false, 'message' => 'Payment cancelled']);
+    });
   });
-
-
-
-
 });
