@@ -13,9 +13,10 @@ use App\Http\Controllers\AdminController\CampaignController;
 use App\Http\Controllers\AdminController\DashboardController;
 use App\Http\Controllers\AdminController\UserProfileController;
 use App\Http\Controllers\AdminController\TransactionHistoryController;
+use Illuminate\Support\Facades\Artisan;
 
 Route::middleware('auth')->group(function () {
-    
+
     Route::get('/', [DashboardController::class, 'dashboard'])->name('dashboard');
 
 
@@ -44,8 +45,8 @@ Route::middleware('auth')->group(function () {
     });
 
 
-   Route::get('userprofile', [UserProfileController::class, 'edit'])->name('userprofile');
-   Route::put('userprofile', [UserProfileController::class, 'update'])->name('userprofile.update');
+    Route::get('userprofile', [UserProfileController::class, 'edit'])->name('userprofile');
+    Route::put('userprofile', [UserProfileController::class, 'update'])->name('userprofile.update');
 
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -84,5 +85,11 @@ Route::get('/payment/cancel', [PaymentController::class, 'cancel'])->name('payme
 
 // Webhook (must be POST, set this URL in Stripe dashboard)
 Route::post('/stripe/webhook', [PaymentController::class, 'webhook']);
+
+
+Route::get('/clear', function () {
+    Artisan::call('optimize:clear');
+    return "✅ All cache cleared successfully!";
+});
 
 require __DIR__ . '/auth.php';
