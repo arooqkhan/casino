@@ -54,9 +54,9 @@ class ProfileController extends Controller
         $validation = ApiHelper::validate($request->all(), [
             'first_name' => 'required|string|max:50',
             'last_name'  => 'required|string|max:50',
-            'dob'        => 'required|date',
+            'dob'        => 'nullable|date',
             'email'      => 'required|email|unique:users,email',
-            'address'    => 'required|string|max:255',
+            'address'    => 'nullable|string|max:255',
             'password'   => 'required|string|min:6',
         ]);
 
@@ -69,9 +69,9 @@ class ProfileController extends Controller
             $user = User::create([
                 'first_name' => $request->first_name,
                 'last_name'  => $request->last_name,
-                'dob'        => $request->dob,
+                'dob'        => $request->dob ?? null,       // nullable
                 'email'      => $request->email,
-                'address'    => $request->address,
+                'address'    => $request->address ?? null,   // nullable
                 'password'   => Hash::make($request->password),
             ]);
 
@@ -87,6 +87,7 @@ class ProfileController extends Controller
             return ApiHelper::sendResponse(false, "Something went wrong", $e->getMessage(), 500);
         }
     }
+
 
 
     public function login(Request $request)
