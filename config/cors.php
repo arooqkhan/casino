@@ -14,12 +14,11 @@ return [
     | To learn more: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
     |
     */
-
     'paths' => ['api/*', 'sanctum/csrf-cookie'],
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['*', 'http://localhost:5173', 'https://iamambassador.vercel.app/'],
+    'allowed_origins' => ['http://localhost:5173/', 'http://localhost:8000/'],
 
     'allowed_origins_patterns' => [],
 
@@ -29,6 +28,6 @@ return [
 
     'max_age' => 0,
 
-    'supports_credentials' => false,
+    'supports_credentials' => true,
 
 ];
