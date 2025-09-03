@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class ProfileController extends Controller
 {
@@ -27,6 +28,16 @@ class ProfileController extends Controller
         $users = User::all();
 
         return ApiHelper::sendResponse(true, "Users retrieved successfully", $users, 200);
+    }
+    public function profile(Request $request)
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return ApiHelper::sendResponse(false, "User not authenticated", null, 401);
+        }
+
+        return ApiHelper::sendResponse(true, "User retrieved successfully", $user, 200);
     }
 
 
@@ -123,5 +134,86 @@ class ProfileController extends Controller
         Log::info("API Response: /api/login", ['status' => 200, 'user_id' => $user->id]);
 
         return ApiHelper::sendResponse(true, 'Login successful', $userData, 200);
+    }
+
+
+    // Forgot Password - Send OTP
+    public function forgotPassword(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email|exists:users,email',
+        ]);
+
+        if ($validator->fails()) {
+            return ApiHelper::sendResponse(false, $validator->errors()->first(), null, 422);
+        }
+
+        $otp = rand(100000, 999999); // 6-digit OTP
+        $user = User::where('email', $request->email)->first();
+        $user->otp = $otp;
+        $user->otp_expires_at = now()->addMinutes(10); // OTP valid for 10 mins
+        $user->save();
+
+        // Send OTP via Email (you can replace with SMS API)
+        Mail::raw("Your OTP is: $otp", function ($message) use ($user) {
+            $message->to($user->email)
+                ->subject('Password Reset OTP');
+        });
+
+        return ApiHelper::sendResponse(true, "OTP sent to your email", null, 200);
+    }
+
+    // Verify OTP
+    public function verifyOtp(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email|exists:users,email',
+            'otp'   => 'required|numeric',
+        ]);
+
+        if ($validator->fails()) {
+            return ApiHelper::sendResponse(false, $validator->errors()->first(), null, 422);
+        }
+
+        $user = User::where('email', $request->email)
+            ->where('otp', $request->otp)
+            ->where('otp_expires_at', '>=', now())
+            ->first();
+
+        if (!$user) {
+            return ApiHelper::sendResponse(false, "Invalid or expired OTP", null, 400);
+        }
+
+        return ApiHelper::sendResponse(true, "OTP verified successfully", null, 200);
+    }
+
+    // Reset Password
+    public function resetPassword(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email'    => 'required|email|exists:users,email',
+            'otp'      => 'required|numeric',
+            'password' => 'required|min:6|confirmed', // must send password + password_confirmation
+        ]);
+
+        if ($validator->fails()) {
+            return ApiHelper::sendResponse(false, $validator->errors()->first(), null, 422);
+        }
+
+        $user = User::where('email', $request->email)
+            ->where('otp', $request->otp)
+            ->where('otp_expires_at', '>=', now())
+            ->first();
+
+        if (!$user) {
+            return ApiHelper::sendResponse(false, "Invalid or expired OTP", null, 400);
+        }
+
+        $user->password = Hash::make($request->password);
+        $user->otp = null; // clear OTP
+        $user->otp_expires_at = null;
+        $user->save();
+
+        return ApiHelper::sendResponse(true, "Password reset successfully", null, 200);
     }
 }

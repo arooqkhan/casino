@@ -14,12 +14,15 @@ Route::prefix('v1')->group(function () {
   Route::post('/login', [ProfileController::class, 'login']);
 
   Route::post('/register', [ProfileController::class, 'register']);
+  Route::post('/forgot-password', [ProfileController::class, 'forgotPassword']);
+  Route::post('/verify-otp', [ProfileController::class, 'verifyOtp']);
+  Route::post('/reset-password', [ProfileController::class, 'resetPassword']);
 
   // Authenticated routes
   Route::middleware('auth:sanctum')->group(function () {
 
 
-    Route::post('/list_profile', [ProfileController::class, 'index']);
+    Route::get('/profile', [ProfileController::class, 'profile']);
 
     Route::get('/user/{id}', [ProfileController::class, 'show']);
 
