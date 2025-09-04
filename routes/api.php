@@ -35,7 +35,10 @@ Route::prefix('v1')->group(function () {
 
 
     Route::post('/purchase-package', [ApiPackagePurchaseController::class, 'createCheckout']);
-    Route::get('/stripe/success', [ApiPackagePurchaseController::class, 'success']);
+    Route::post('joinCampaign', [ApiPackagePurchaseController::class, 'joinCampaign']);
+
+    Route::get('getAllCampaign', [ApiPackagePurchaseController::class, 'getAllCompaign']);
+    
     Route::get('/stripe/cancel', function () {
       return response()->json(['success' => false, 'message' => 'Payment cancelled']);
     });

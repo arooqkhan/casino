@@ -14,7 +14,7 @@ class ApiCampaignController extends Controller
     try {
         
         // $campaigns = Campaign::paginate(10);
-        $campaigns = Campaign::all();
+        $campaigns = Campaign::with('user')->get();
 
         return ApiHelper::sendResponse(true, "Campaign list retrieved successfully", $campaigns, 200);
 
@@ -22,4 +22,10 @@ class ApiCampaignController extends Controller
         return ApiHelper::sendResponse(false, "Something went wrong", $e->getMessage(), 500);
     }
 }
+
+
+
+
+
+
 }
