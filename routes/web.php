@@ -92,4 +92,34 @@ Route::get('/clear', function () {
     return "✅ All cache cleared successfully!";
 });
 
+
+Route::get('/migrate', function () {
+    try {
+        // Drop all tables and re-run all migrations
+        // Artisan::call('migrate:fresh', [
+        //     '--force' => true,
+        // ]);
+
+        Artisan::call('migrate', [
+            '--force' => true,
+        ]);
+
+        // Run the DatabaseSeeder (which can call other seeders)
+        // Artisan::call('db:seed', [
+        //     '--force' => true,
+        // ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Database migrated and seeded successfully.',
+            'output' => Artisan::output(),
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => $e->getMessage(),
+        ], 500);
+    }
+});
+
 require __DIR__ . '/auth.php';
