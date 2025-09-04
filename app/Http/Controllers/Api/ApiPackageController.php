@@ -14,9 +14,9 @@ class ApiPackageController extends Controller
     try {
         // agar tumhe pagination chahiye to:
         // $bonuses = Bonus::paginate(10);
-        $bonuses = Package::all();
+        $packages = Package::all();
 
-        return ApiHelper::sendResponse(true, "Bonus list retrieved successfully", $bonuses, 200);
+        return ApiHelper::sendResponse(true, "Packages list retrieved successfully", $packages);
 
     } catch (\Exception $e) {
         return ApiHelper::sendResponse(false, "Something went wrong", $e->getMessage(), 500);
