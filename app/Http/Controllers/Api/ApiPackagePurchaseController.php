@@ -3,22 +3,27 @@
 namespace App\Http\Controllers\Api;
 
 use Stripe\Stripe;
+use App\Models\User;
 use App\Models\Package;
 use Stripe\StripeClient;
+use App\Helpers\ApiHelper;
 use App\Models\PackageUser;
 use Illuminate\Http\Request;
 use Stripe\Checkout\Session;
 use App\Models\CampaignSubscribe;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class ApiPackagePurchaseController extends Controller
 {
-     public function createCheckout(Request $request)
+    public function createCheckout(Request $request)
     {
         $validated = $request->validate([
             'package_id' => 'required|exists:packages,id',
-            'user_id'    => 'required|exists:users,id',
+
         ]);
+
+        $user = Auth::user()->id;
 
         $package = Package::findOrFail($validated['package_id']);
 
@@ -38,7 +43,7 @@ class ApiPackagePurchaseController extends Controller
                     'quantity' => 1,
                 ]],
                 'mode' => 'payment',
-                'success_url' => url('/api/stripe/success?session_id={CHECKOUT_SESSION_ID}&package_id=' . $package->id . '&user_id=' . $validated['user_id']),
+                'success_url' => url('/api/stripe/success?session_id={CHECKOUT_SESSION_ID}&package_id=' . $package->id . '&user_id=' . $user),
                 'cancel_url'  => url('/api/stripe/cancel'),
             ]);
 
@@ -54,38 +59,47 @@ class ApiPackagePurchaseController extends Controller
         }
     }
 
-   public function success(Request $request)
+  public function joinCampaign(Request $request)
 {
-    $packageId = $request->query('package_id');
-    $userId    = $request->query('user_id');
-    $campaignId = $request->query('campaign_id'); // agar campaign bhi pass karna hai
+    $userId = Auth::user()->id;
+    $package = PackageUser::where('user_id', $userId)->first();
 
-    try {
-        // ✅ Save in package_user
-        PackageUser::create([
-            'package_id' => $packageId,
-            'user_id'    => $userId,
-            'time'       => now(),
-        ]);
+    if (!empty($package)) {
 
-        // ✅ Save in campaign_subscribe (agar campaign_id mila ho)
-        if ($campaignId) {
-            CampaignSubscribe::create([
-                'user_id'     => $userId,
-                'campaign_id' => $campaignId,
-            ]);
+        // ✅ campaign_id from body instead of query
+        $campaignId = $request->input('campaign_id'); 
+
+        try {
+           
+            // ✅ Save in campaign_subscribe (if campaign_id exists in body)
+            if ($campaignId) {
+                $compaign =CampaignSubscribe::create([
+                    'user_id'     => $userId,
+                    'campaign_id' => $campaignId,
+                ]);
+            }
+
+        
+
+            return ApiHelper::sendResponse(true, "Package successfully campaign joined", $compaign, 200);
+
+        } catch (\Exception $e) {
+            return ApiHelper::sendResponse(false, "Failed to Joining campanign:", $e->getMessage(), 500);
         }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Package successfully purchased & campaign joined',
-        ]);
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Failed to save purchase: ' . $e->getMessage(),
-        ], 500);
+    } else {
+        return ApiHelper::sendResponse(false, "Package Not Found", '', 404);
     }
 }
+
+
+ public function getAllCompaign()
+    {
+        // Get all users with their subscribed campaigns
+        $users = User::with(['campaigns' => function ($query) {
+            $query->select('campaigns.id', 'campaigns.name', 'campaigns.status');
+        }])->get(['id', 'first_name','last_name', 'email']);
+
+       return ApiHelper::sendResponse(true, "Campaign list", $users);
+    }
 
 }

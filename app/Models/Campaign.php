@@ -23,12 +23,25 @@ class Campaign extends Model
         return $this->hasMany(Bonus::class);
     }
 
+   public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
 
     protected $casts = [
     'start_at'      => 'datetime',
     'end_at'        => 'datetime',
     'countdown_end' => 'datetime',
 ];
+
+
+public function users()
+{
+    return $this->belongsToMany(User::class, 'campaign_subscribe')
+                ->withTimestamps();
+}
+
 
 
 }
