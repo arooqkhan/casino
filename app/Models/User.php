@@ -76,6 +76,11 @@ class User extends Authenticatable
                 ->withTimestamps();
 }
 
+public function subscribedCampaigns()
+{
+    return $this->belongsToMany(Campaign::class, 'campaign_subscribe', 'user_id', 'campaign_id');
+}
+
 
 
 
