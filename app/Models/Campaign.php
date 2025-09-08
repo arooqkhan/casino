@@ -45,5 +45,13 @@ public function users()
 }
 
 
+public function subscribers()
+{
+    return $this->belongsToMany(User::class, 'campaign_subscribe', 'campaign_id', 'user_id');
+}
+
+
+
+
 
 }

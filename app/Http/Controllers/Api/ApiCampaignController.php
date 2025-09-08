@@ -9,19 +9,20 @@ use App\Http\Controllers\Controller;
 
 class ApiCampaignController extends Controller
 {
-   public function index(Request $request)
+
+public function index(Request $request)
 {
     try {
-        
-        // $campaigns = Campaign::paginate(10);
-        $campaigns = Campaign::with('user')->get();
+        // Campaign ke sath creator aur subscribers load karna
+        $campaigns = Campaign::with(['subscribers'])->get();
 
-        return ApiHelper::sendResponse(true, "Campaign list retrieved successfully", $campaigns, 200);
+        return ApiHelper::sendResponse(true, "Campaign list retrieved successfully", $campaigns);
 
     } catch (\Exception $e) {
         return ApiHelper::sendResponse(false, "Something went wrong", $e->getMessage(), 500);
     }
 }
+
 
 
 
