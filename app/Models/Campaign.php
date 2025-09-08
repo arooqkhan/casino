@@ -15,6 +15,8 @@ class Campaign extends Model
     'end_at',
     'countdown_end',
     'terms',
+    'color',
+    'shadow',
 ];
 
 
