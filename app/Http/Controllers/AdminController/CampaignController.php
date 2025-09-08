@@ -29,7 +29,7 @@ class CampaignController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-   public function store(Request $request)
+public function store(Request $request)
 {
     $validated = $request->validate([
         'name'          => 'required|string|max:255',
@@ -39,6 +39,10 @@ class CampaignController extends Controller
         'end_at'        => 'nullable|date|after_or_equal:start_at',
         'countdown_end' => 'nullable|date|after_or_equal:start_at',
         'terms'         => 'nullable|string',
+
+        // ✅ new fields
+        'color'         => 'required|string|max:20',
+        'shadow'        => 'required|string|max:255',
     ]);
 
     Campaign::create($validated);
@@ -46,6 +50,7 @@ class CampaignController extends Controller
     return redirect()->route('campaigns.index')
                      ->with('success', 'Campaign created successfully.');
 }
+
 
     /**
      * Display the specified resource.
@@ -67,7 +72,7 @@ class CampaignController extends Controller
     /**
      * Update the specified resource in storage.
      */
-   public function update(Request $request, string $id)
+public function update(Request $request, string $id)
 {
     $validated = $request->validate([
         'name'          => 'required|string|max:255',
@@ -77,6 +82,10 @@ class CampaignController extends Controller
         'end_at'        => 'nullable|date|after_or_equal:start_at',
         'countdown_end' => 'nullable|date|after_or_equal:start_at',
         'terms'         => 'nullable|string',
+
+        // ✅ new fields
+        'color'         => 'required|string|max:20',
+        'shadow'        => 'required|string|max:255',
     ]);
 
     $campaign = Campaign::findOrFail($id);
@@ -85,6 +94,7 @@ class CampaignController extends Controller
     return redirect()->route('campaigns.index')
                      ->with('success', 'Campaign updated successfully.');
 }
+
 
 
     /**
