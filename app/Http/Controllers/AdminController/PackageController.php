@@ -42,6 +42,9 @@ class PackageController extends Controller
             'price'  => 'required|numeric|min:0',
             'icon'   => 'nullable|image|mimes:png,jpg,jpeg,svg|max:2048',
             'credit' => 'required|integer|min:0',
+
+            'color'         => 'required|string|max:20',
+            'shadow'        => 'required|string|max:255',
         ]);
 
         try {
@@ -95,21 +98,18 @@ class PackageController extends Controller
             'price'  => 'required|numeric|min:0',
             'icon'   => 'nullable|image|mimes:png,jpg,jpeg,svg|max:2048',
             'credit' => 'required|integer|min:0',
+
+            'color'         => 'required|string|max:20',
+            'shadow'        => 'required|string|max:255',
         ]);
 
         try {
             // ✅ Agar nayi image upload ho
             if ($request->hasFile('icon')) {
-                // Purani image delete karo agar exist karti ho
-                if ($package->icon && file_exists(public_path($package->icon))) {
-                    unlink(public_path($package->icon));
-                }
-
                 $file = $request->file('icon');
-                $filename = 'images/packages/' . time() . '_' . $file->getClientOriginalName();
-                $file->move(public_path('images/packages'), $filename);
-
-                $validated['icon'] = $filename;
+                $filename = 'images/projects/' . time() . '_' . $file->getClientOriginalName();
+                $file->move(public_path('images/projects'), $filename);
+                $validated['icon'] = $filename; // save path into DB
             }
 
             // ✅ Record update karo
@@ -126,23 +126,23 @@ class PackageController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-   public function destroy(string $id)
-{
-    $package = Package::findOrFail($id);
+    public function destroy(string $id)
+    {
+        $package = Package::findOrFail($id);
 
-    try {
-        // ✅ Agar package ka icon hai to delete karo
-        if ($package->icon && file_exists(public_path($package->icon))) {
-            unlink(public_path($package->icon));
+        try {
+            // ✅ Agar package ka icon hai to delete karo
+            if ($package->icon && file_exists(public_path($package->icon))) {
+                unlink(public_path($package->icon));
+            }
+
+            $package->delete();
+
+            return redirect()->route('packages.index')
+                ->with('success', 'Package deleted successfully!');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Something went wrong: ' . $e->getMessage());
         }
-
-        $package->delete();
-
-        return redirect()->route('packages.index')
-            ->with('success', 'Package deleted successfully!');
-    } catch (\Exception $e) {
-        return redirect()->back()
-            ->with('error', 'Something went wrong: ' . $e->getMessage());
     }
-}
 }

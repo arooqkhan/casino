@@ -216,4 +216,33 @@ class ProfileController extends Controller
 
         return ApiHelper::sendResponse(true, "Password reset successfully", null, 200);
     }
+
+
+
+    // Update profile
+
+    public function updateProfile(Request $request)
+{
+    $user = Auth::user();
+
+    if (!$user) {
+        return ApiHelper::sendResponse(false, "User not authenticated", null, 401);
+    }
+
+    try {
+        // request se sabhi fields lo except system fields (jaise id, password, created_at, updated_at etc.)
+        $data = $request->except(['id', 'password', 'created_at', 'updated_at', 'deleted_at', 'email_verified_at']);
+
+        // update user
+        $user->fill($data);
+        $user->save();
+
+        return ApiHelper::sendResponse(true, "Profile updated successfully", $user, 200);
+
+    } catch (\Exception $e) {
+        return ApiHelper::sendResponse(false, "Something went wrong", $e->getMessage(), 500);
+    }
+}
+
+
 }
