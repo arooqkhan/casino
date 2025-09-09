@@ -54,10 +54,51 @@
                         </div>
                     </div>
 
+                    
+                    <div class="row mb-4">
+                        <div class="col-sm-6">
+                            <label for="color">Bonus Color</label>
+                            <div class="d-flex align-items-center">
+                                <input type="color" name="color" id="color" class="form-control form-control-color"
+                                    value="{{ old('color', $bonus->color ?? '#ff0000') }}"
+                                    style="width: 60px; height: 40px; padding: 2px;">
+                                <span id="color-preview" class="ms-3 px-3 py-2 rounded"
+                                    style="border:1px solid #ccc; background: {{ old('color', $bonus->color ?? '#ff0000') }};">
+                                    {{ old('color', $bonus->color ?? '#ff0000') }}
+                                </span>
+                            </div>
+                            @error('color')
+                            <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <div class="col-sm-6">
+                            <label for="shadow">Shadow</label>
+                            <input type="text" name="shadow" id="shadow" class="form-control"
+                                value="{{ old('shadow', $bonus->shadow ?? '0px 0px 10px 0px') }}">
+                            @error('shadow')
+                            <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+
+
                     <button type="submit" class="btn btn-primary">Update Package</button>
                 </form>
             </div>
         </div>
     </div>
 </div>
+
+{{-- Script for live color preview --}}
+<script>
+    document.getElementById('color').addEventListener('input', function() {
+        let color = this.value;
+        let preview = document.getElementById('color-preview');
+        preview.style.backgroundColor = color;
+        preview.textContent = color;
+    });
+</script>
+
+
 @endsection
