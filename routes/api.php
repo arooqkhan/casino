@@ -25,6 +25,14 @@ Route::prefix('v1')->group(function () {
 
     Route::get('/profile', [ProfileController::class, 'profile']);
 
+
+    Route::post('/profile-update', [ProfileController::class, 'updateProfile']);
+
+
+
+
+
+
     Route::get('/user/{id}', [ProfileController::class, 'show']);
 
     Route::get('/bonuses', [ApiBonusController::class, 'index']);
