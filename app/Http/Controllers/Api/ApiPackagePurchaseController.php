@@ -23,9 +23,12 @@ class ApiPackagePurchaseController extends Controller
 
         ]);
 
-        $user = Auth::user()->id;
+        $user = Auth::user();
 
         $package = Package::findOrFail($validated['package_id']);
+
+         $user->total_credit += $package->credit;
+         $user->save();
 
         try {
             Stripe::setApiKey(config('services.stripe.secret'));
@@ -43,7 +46,7 @@ class ApiPackagePurchaseController extends Controller
                     'quantity' => 1,
                 ]],
                 'mode' => 'payment',
-                'success_url' => url('/api/stripe/success?session_id={CHECKOUT_SESSION_ID}&package_id=' . $package->id . '&user_id=' . $user),
+                'success_url' => url('/api/stripe/success?session_id={CHECKOUT_SESSION_ID}&package_id=' . $package->id . '&user_id=' . $user->id),
                 'cancel_url'  => url('/api/stripe/cancel'),
             ]);
 
@@ -59,35 +62,54 @@ class ApiPackagePurchaseController extends Controller
         }
     }
 
-  public function joinCampaign(Request $request)
+public function joinCampaign(Request $request)
 {
-    $userId = Auth::user()->id;
-    $package = PackageUser::where('user_id', $userId)->first();
+    $user = Auth::user();
 
-    if (!empty($package)) {
+    // ✅ Find PackageUser entry
+    $packageUser = PackageUser::where('user_id', $user->id)->first();
 
-        // ✅ campaign_id from body instead of query
-        $campaignId = $request->input('campaign_id'); 
-
-        try {
-           
-            // ✅ Save in campaign_subscribe (if campaign_id exists in body)
-            if ($campaignId) {
-                $compaign =CampaignSubscribe::create([
-                    'user_id'     => $userId,
-                    'campaign_id' => $campaignId,
-                ]);
-            }
-
-        
-
-            return ApiHelper::sendResponse(true, "Package successfully campaign joined", $compaign, 200);
-
-        } catch (\Exception $e) {
-            return ApiHelper::sendResponse(false, "Failed to Joining campanign:", $e->getMessage(), 500);
-        }
-    } else {
+    if (!$packageUser) {
         return ApiHelper::sendResponse(false, "Package Not Found", '', 404);
+    }
+
+    // ✅ Get the package using package_id
+    $package = Package::find($packageUser->package_id);
+
+    if (!$package) {
+        return ApiHelper::sendResponse(false, "Package details not found", '', 404);
+    }
+
+    // ✅ Check if user has enough credits
+    if ($user->total_credit < $package->credit) {
+        return ApiHelper::sendResponse(false, "Insufficient credits", '', 400);
+    }
+
+    // ✅ Deduct credits
+    $user->total_credit -= $package->credit;
+    $user->save();
+
+    // ✅ campaign_id from request body
+    $campaignId = $request->input('campaign_id'); 
+
+    if (!$campaignId) {
+        return ApiHelper::sendResponse(false, "Campaign ID is required", '', 422);
+    }
+
+    try {
+        // ✅ Save in campaign_subscribe
+        $subscribe = CampaignSubscribe::create([
+            'user_id'     => $user->id,
+            'campaign_id' => $campaignId,
+        ]);
+
+        return ApiHelper::sendResponse(true, "Package successfully campaign joined", [
+            'subscription'     => $subscribe,
+            'remaining_credit' => $user->total_credit,
+        ], 200);
+
+    } catch (\Exception $e) {
+        return ApiHelper::sendResponse(false, "Failed to join campaign", $e->getMessage(), 500);
     }
 }
 
