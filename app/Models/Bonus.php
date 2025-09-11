@@ -13,6 +13,7 @@ class Bonus extends Model
         'valid_until',
         'color',
         'shadow',
+        'description',
     ];
 
     public function campaign()
