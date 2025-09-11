@@ -29,16 +29,31 @@ class ProfileController extends Controller
 
         return ApiHelper::sendResponse(true, "Users retrieved successfully", $users, 200);
     }
-    public function profile(Request $request)
-    {
-        $user = Auth::user();
 
-        if (!$user) {
-            return ApiHelper::sendResponse(false, "User not authenticated", null, 401);
-        }
+  public function profile(Request $request)
+{
+    $user = Auth::user();
 
-        return ApiHelper::sendResponse(true, "User retrieved successfully", $user, 200);
+    if (!$user) {
+        return ApiHelper::sendResponse(false, "User not authenticated", null, 401);
     }
+
+    // user_id ke basis par packages get karo
+    $packages = \DB::table('package_user')
+        ->join('packages', 'package_user.package_id', '=', 'packages.id')
+        ->where('package_user.user_id', $user->id)
+        ->select('packages.*')
+        ->get();
+
+    // user + packages merge karke response
+    $data = [
+        'user' => $user,
+        'packages' => $packages,
+    ];
+
+    return ApiHelper::sendResponse(true, "User retrieved successfully", $data, 200);
+}
+
 
 
     public function show($id)
