@@ -39,6 +39,7 @@ class BonusController extends Controller
         'valid_until' => 'nullable|date|after_or_equal:valid_from',
         'color'         => 'required|string|max:20',
         'shadow'        => 'required|string|max:255',
+        'description'        => 'nullable|string|max:255',
     ]);
 
     Bonus::create($request->all());
@@ -74,8 +75,9 @@ class BonusController extends Controller
         'campaign_id' => 'nullable|exists:campaigns,id',
         'valid_from' => 'nullable|date',
         'valid_until' => 'nullable|date|after_or_equal:valid_from',
-        'color'         => 'required|string|max:20',
-        'shadow'        => 'required|string|max:255',
+        'color'         => 'nullable|string|max:20',
+        'shadow'        => 'nullable|string|max:255',
+        'description'        => 'nullable|string|max:255',
     ]);
 
     $bonus = Bonus::findOrFail($id);

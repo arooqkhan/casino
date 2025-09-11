@@ -96,6 +96,17 @@
             @enderror
         </div>
     </div>
+    
+        <div class="row mb-4">
+        <div class="col-12">
+            <label for="description">Description</label>
+            <textarea name="description" id="description" rows="4" class="form-control"
+                placeholder="Enter bonus description...">{{ old('description', $bonus->description) }}</textarea>
+            @error('description')
+            <span class="text-danger">{{ $message }}</span>
+            @enderror
+        </div>
+    </div>
 
     <button type="submit" class="btn btn-primary">Update Bonus</button>
 </form>
