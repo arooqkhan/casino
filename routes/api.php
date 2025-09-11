@@ -9,7 +9,7 @@ use App\Http\Controllers\Api\ApiPackagePurchaseController;
 use App\Http\Controllers\Api\ApiWinningCompaignController;
 use App\Http\Controllers\Api\ProfileController; // make sure this exists
 
-Route::prefix('v1')->group(function () {
+  Route::prefix('v1')->group(function () {
 
   // Public route
   Route::post('/login', [ProfileController::class, 'login']);
