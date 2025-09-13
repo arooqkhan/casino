@@ -57,7 +57,7 @@ class ApiBonusController extends Controller
 
         return response()->json([
             'status'  => true,
-            'message' => 'Package purchased successfully',
+            'message' => 'Bonus purchased successfully',
             'data'    => [
                 'user_id'    => $user->id,
                 'bonus_id'   => $request->bonus_id,
