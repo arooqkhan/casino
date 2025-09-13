@@ -20,4 +20,12 @@ class Bonus extends Model
     {
         return $this->belongsTo(Campaign::class);
     }
+
+     public function users()
+    {
+        return $this->belongsToMany(User::class, 'bonus_users', 'bonus_id', 'user_id')
+                    ->withPivot('time')
+                    ->withTimestamps();
+    }
+    
 }

@@ -86,6 +86,14 @@ public function subscribedCampaigns()
 }
 
 
+public function bonuses()
+    {
+        return $this->belongsToMany(Bonus::class, 'bonus_users', 'user_id', 'bonus_id')
+                    ->withPivot('time')
+                    ->withTimestamps();
+    }
+
+
 
 
 
