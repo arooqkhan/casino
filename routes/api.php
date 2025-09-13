@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\ApiCampaignController;
 use App\Http\Controllers\Api\ApiPackagePurchaseController;
 use App\Http\Controllers\Api\ApiWinningCompaignController;
 use App\Http\Controllers\Api\ProfileController; // make sure this exists
+use App\Models\Bonus;
 
   Route::prefix('v1')->group(function () {
 
@@ -50,9 +51,17 @@ use App\Http\Controllers\Api\ProfileController; // make sure this exists
 
 
     Route::post('/campaigns/declare-winner', [ApiWinningCompaignController::class, 'declareWinner']);
+
+
+    Route::post('/purchase-bonus', [ApiBonusController::class, 'purchase']);
+
+
     
     Route::get('/stripe/cancel', function () {
       return response()->json(['success' => false, 'message' => 'Payment cancelled']);
     });
+
+
+
   });
 });
