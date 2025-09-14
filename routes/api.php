@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\ApiPackagePurchaseController;
 use App\Http\Controllers\Api\ApiWinningCompaignController;
 use App\Http\Controllers\Api\ProfileController; // make sure this exists
 use App\Models\Bonus;
+use Chatify\Http\Controllers\Api\MessagesController;
 
   Route::prefix('v1')->group(function () {
 
@@ -54,6 +55,19 @@ use App\Models\Bonus;
 
 
     Route::post('/purchase-bonus', [ApiBonusController::class, 'purchase']);
+
+
+    // Chatify apis
+
+        Route::post('/sendMessage', [MessagesController::class, 'send'])->name('api.send.message');
+
+        Route::post('/fetchMessages', [MessagesController::class,'fetch'])->name('api.fetch.messages');
+
+        Route::get('/getContacts', [MessagesController::class, 'getContacts'])->name('api.contacts.get');
+
+        Route::post('/chat/auth', [MessagesController::class,'pusherAuth'])->name('api.pusher.auth');
+
+        Route::post('/makeSeen', [MessagesController::class,'seen'])->name('api.messages.seen');
 
 
     
