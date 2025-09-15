@@ -123,10 +123,23 @@ Route::get('/migrate', function () {
 });
 
 Route::get('/seed', function () {
+    try {
+        Artisan::call('db:seed', [
+            '--force' => true,
+        ]);
 
-    Artisan::call('db:seed', [
-        '--force' => true,
-    ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Database  seeded successfully.',
+            'output' => Artisan::output(),
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => $e->getMessage(),
+        ], 500);
+    }
 });
 
 require __DIR__ . '/auth.php';
