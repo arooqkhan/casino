@@ -122,4 +122,11 @@ Route::get('/migrate', function () {
     }
 });
 
+Route::get('/seed', function () {
+
+    Artisan::call('db:seed', [
+        '--force' => true,
+    ]);
+});
+
 require __DIR__ . '/auth.php';
