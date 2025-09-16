@@ -148,12 +148,12 @@ public function joinCampaign(Request $request)
             $user->save();
 
             // Redirect back to React dashboard
-            return redirect('http://localhost:3000/dashboard?status=success');
+           return redirect('http://localhost:5173/payment-success');
         }
 
-        return redirect('http://localhost:3000/dashboard?status=failed');
+          return redirect('http://localhost:5173/payment-failed');
     } catch (\Exception $e) {
-        return redirect('http://localhost:3000/dashboard?status=error&message=' . urlencode($e->getMessage()));
+         return redirect('http://localhost:5173/payment-error?message=' . urlencode($e->getMessage()));
     }
 }
 
