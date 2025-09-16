@@ -246,6 +246,46 @@
 
 
 
+            {{-- ✅ Contact Us Menu --}}
+            <li class="menu {{ request()->routeIs('contactus.index') ? 'active' : '' }}">
+                <a href="{{ route('contactus.index') }}" class="dropdown-toggle">
+                    <div>
+                        <!-- Contact Us Icon (Mail Icon) -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="feather">
+                            <path d="M4 4h16v16H4z"></path>
+                            <polyline points="22,6 12,13 2,6"></polyline>
+                        </svg>
+                        <span>Contact Us</span>
+                    </div>
+                </a>
+            </li>
+
+            
+           {{-- ✅ FAQ Menu --}}
+<li class="menu {{ request()->routeIs('faq.index') ? 'active' : '' }}">
+    <a href="{{ route('faq.index') }}" class="dropdown-toggle">
+        <div>
+            <!-- FAQ Icon (Question Circle) -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="feather">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                <line x1="12" y1="17" x2="12" y2="17"></line>
+            </svg>
+            <span>FAQ</span>
+        </div>
+    </a>
+</li>
+
+
+
+
+
 
 
 

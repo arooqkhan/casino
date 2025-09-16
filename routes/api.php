@@ -1,15 +1,17 @@
 <?php
 
+use App\Models\Bonus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\ApiFaqController;
 use App\Http\Controllers\Api\ApiBonusController;
 use App\Http\Controllers\Api\ApiPackageController;
 use App\Http\Controllers\Api\ApiCampaignController;
+use Chatify\Http\Controllers\Api\MessagesController;
 use App\Http\Controllers\Api\ApiPackagePurchaseController;
 use App\Http\Controllers\Api\ApiWinningCompaignController;
+use App\Http\Controllers\AdminController\ContactUsController;
 use App\Http\Controllers\Api\ProfileController; // make sure this exists
-use App\Models\Bonus;
-use Chatify\Http\Controllers\Api\MessagesController;
 
   Route::prefix('v1')->group(function () {
 
@@ -60,6 +62,14 @@ use Chatify\Http\Controllers\Api\MessagesController;
 
     Route::get('/stripe/success', [ApiPackagePurchaseController::class, 'success'])->name('stripe.success');
     Route::get('/stripe/cancel', [ApiPackagePurchaseController::class, 'cancel'])->name('stripe.cancel');
+
+
+
+
+    Route::post('/contact-us', [ContactUsController::class, 'store']);
+
+
+    Route::get('/faqs', [ApiFaqController::class, 'listApi']);
 
 
     // Chatify apis

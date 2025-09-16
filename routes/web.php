@@ -2,18 +2,21 @@
 
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
+
+use App\Http\Controllers\AdminController\FaqController;
 use App\Http\Controllers\AdminController\UserController;
 use App\Http\Controllers\AdminController\BonusController;
 use App\Http\Controllers\AdminController\WalletController;
 use App\Http\Controllers\AdminController\CreatedController;
 use App\Http\Controllers\AdminController\PackageController;
 use App\Http\Controllers\AdminController\CampaignController;
+use App\Http\Controllers\AdminController\ContactUsController;
 use App\Http\Controllers\AdminController\DashboardController;
 use App\Http\Controllers\AdminController\UserProfileController;
 use App\Http\Controllers\AdminController\TransactionHistoryController;
-use Illuminate\Support\Facades\Artisan;
 
 Route::middleware('auth')->group(function () {
 
@@ -36,6 +39,11 @@ Route::middleware('auth')->group(function () {
 
 
     Route::resource('wallet', WalletController::class);
+
+
+    Route::resource('contactus', ContactUsController::class);
+
+    Route::resource('faq', FaqController::class);
 
 
 
