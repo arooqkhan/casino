@@ -5,12 +5,13 @@ namespace App\Http\Controllers\Api;
 use App\Models\User;
 use App\Helpers\ApiHelper;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
 
 class ProfileController extends Controller
 {
@@ -30,7 +31,7 @@ class ProfileController extends Controller
         return ApiHelper::sendResponse(true, "Users retrieved successfully", $users, 200);
     }
 
-  public function profile(Request $request)
+public function profile(Request $request)
 {
     $user = Auth::user();
 
@@ -38,8 +39,18 @@ class ProfileController extends Controller
         return ApiHelper::sendResponse(false, "User not authenticated", null, 401);
     }
 
+    // Agar user ke table me image column hai
+    if (!empty($user->image)) {
+        // full url generate karo
+        $user->image = asset('projects/' . $user->image); 
+        // agar storage use kar rahe ho to:
+        // $user->image = Storage::url($user->image);
+    } else {
+        $user->image = asset('uploads/default.png'); // default image agar empty ho
+    }
+
     // user_id ke basis par packages get karo
-    $packages = \DB::table('package_user')
+    $packages = DB::table('package_user')
         ->join('packages', 'package_user.package_id', '=', 'packages.id')
         ->where('package_user.user_id', $user->id)
         ->select('packages.*')
@@ -53,6 +64,7 @@ class ProfileController extends Controller
 
     return ApiHelper::sendResponse(true, "User retrieved successfully", $data, 200);
 }
+
 
 
 
@@ -236,7 +248,7 @@ class ProfileController extends Controller
 
     // Update profile
 
-    public function updateProfile(Request $request)
+   public function updateProfile(Request $request)
 {
     $user = Auth::user();
 
@@ -245,12 +257,48 @@ class ProfileController extends Controller
     }
 
     try {
-        // request se sabhi fields lo except system fields (jaise id, password, created_at, updated_at etc.)
-        $data = $request->except(['id', 'password', 'created_at', 'updated_at', 'deleted_at', 'email_verified_at']);
+        // Validation
+        $request->validate([
+            'first_name' => 'required|string|max:100',
+            'last_name'  => 'required|string|max:100',
+            'email'      => 'required|email|unique:users,email,' . $user->id,
+            'image'      => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
 
-        // update user
-        $user->fill($data);
+        // Basic info update
+        $user->first_name = $request->first_name;
+        $user->last_name  = $request->last_name;
+        $user->email      = $request->email;
+
+        // Image handle
+        if ($request->hasFile('image')) {
+            // Purani image delete kar do agar hai
+            if ($user->image && File::exists(public_path($user->image))) {
+                File::delete(public_path($user->image));
+            }
+
+            $image = $request->file('image');
+            $imageName = time() . '.' . $image->getClientOriginalExtension();
+            $uploadPath = public_path('uploads/profile');
+
+            // Agar folder exist nahi karta to bana lo
+            if (!File::exists($uploadPath)) {
+                File::makeDirectory($uploadPath, 0777, true, true);
+            }
+
+            // Image move karo
+            $image->move($uploadPath, $imageName);
+
+            // Database me path save karo
+            $user->image = 'uploads/profile/' . $imageName;
+        }
+
         $user->save();
+
+        // Response ke liye full image url dikhaye
+        if ($user->image) {
+            $user->image = asset($user->image);
+        }
 
         return ApiHelper::sendResponse(true, "Profile updated successfully", $user, 200);
 
@@ -258,6 +306,7 @@ class ProfileController extends Controller
         return ApiHelper::sendResponse(false, "Something went wrong", $e->getMessage(), 500);
     }
 }
+
 
 
 }

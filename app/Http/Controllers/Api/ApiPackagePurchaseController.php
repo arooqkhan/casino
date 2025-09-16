@@ -46,8 +46,8 @@ class ApiPackagePurchaseController extends Controller
                     'quantity' => 1,
                 ]],
                 'mode' => 'payment',
-                'success_url' => url('/api/stripe/success?session_id={CHECKOUT_SESSION_ID}&package_id=' . $package->id . '&user_id=' . $user->id),
-                'cancel_url'  => url('/api/stripe/cancel'),
+                'success_url' => route('stripe.success'),
+                'cancel_url'  => route('stripe.cancel'),
             ]);
 
             return response()->json([
@@ -61,6 +61,10 @@ class ApiPackagePurchaseController extends Controller
             ], 500);
         }
     }
+
+
+
+
 
 public function joinCampaign(Request $request)
 {
@@ -123,5 +127,41 @@ public function joinCampaign(Request $request)
 
        return ApiHelper::sendResponse(true, "Campaign list", $users);
     }
+
+
+
+
+
+    public function success(Request $request)
+{
+    \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+
+    try {
+        $session = \Stripe\Checkout\Session::retrieve($request->session_id);
+
+        if ($session->payment_status === 'paid') {
+            $user    = User::findOrFail($request->user_id);
+            $package = Package::findOrFail($request->package_id);
+
+            // ✅ Add credits only after success
+            $user->total_credit += $package->credit;
+            $user->save();
+
+            // Redirect back to React dashboard
+            return redirect('http://localhost:3000/dashboard?status=success');
+        }
+
+        return redirect('http://localhost:3000/dashboard?status=failed');
+    } catch (\Exception $e) {
+        return redirect('http://localhost:3000/dashboard?status=error&message=' . urlencode($e->getMessage()));
+    }
+}
+
+public function cancel()
+{
+    return redirect('http://localhost:3000/dashboard?status=cancel');
+}
+
+
 
 }
