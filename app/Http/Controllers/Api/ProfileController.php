@@ -44,10 +44,8 @@ public function profile(Request $request)
 
     // Agar user ke table me image column hai
     if (!empty($user->image)) {
-        // full url generate karo
-        $user->image = asset('projects/' . $user->image); 
-        // agar storage use kar rahe ho to:
-        // $user->image = Storage::url($user->image);
+        // Correct full url
+        $user->image = asset($user->image); 
     } else {
         $user->image = asset('uploads/default.png'); // default image agar empty ho
     }
