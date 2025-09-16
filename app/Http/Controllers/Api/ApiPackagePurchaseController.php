@@ -47,7 +47,7 @@ class ApiPackagePurchaseController extends Controller
                 ]],
                 'mode' => 'payment',
                 'success_url' => route('stripe.success'),
-                'cancel_url'  => route('stripe.cancel'),
+                'cancel_url' => url('/api/stripe/cancel'),
             ]);
 
             return response()->json([
