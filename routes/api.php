@@ -46,6 +46,7 @@ use Chatify\Http\Controllers\Api\MessagesController;
 
 
     Route::post('/purchase-package', [ApiPackagePurchaseController::class, 'createCheckout']);
+
     Route::post('/joinCampaign', [ApiPackagePurchaseController::class, 'joinCampaign']);
 
     Route::get('/getAllCampaign', [ApiPackagePurchaseController::class, 'getAllCompaign']);
@@ -55,6 +56,10 @@ use Chatify\Http\Controllers\Api\MessagesController;
 
 
     Route::post('/purchase-bonus', [ApiBonusController::class, 'purchase']);
+
+
+    Route::get('/stripe/success', [ApiPackagePurchaseController::class, 'success'])->name('stripe.success');
+    Route::get('/stripe/cancel', [ApiPackagePurchaseController::class, 'cancel'])->name('stripe.cancel');
 
 
     // Chatify apis
