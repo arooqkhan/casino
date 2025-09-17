@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\ApiPackagePurchaseController;
 use App\Http\Controllers\Api\ApiWinningCompaignController;
 use App\Http\Controllers\AdminController\ContactUsController;
 use App\Http\Controllers\Api\ProfileController; // make sure this exists
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
   Route::prefix('v1')->group(function () {
 
@@ -19,6 +20,20 @@ use App\Http\Controllers\Api\ProfileController; // make sure this exists
   Route::post('/login', [ProfileController::class, 'login']);
 
   Route::post('/register', [ProfileController::class, 'register']);
+
+  // Email verification routes
+Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+    $request->fulfill();
+    return response()->json(['message' => 'Email verified successfully.']);
+})->middleware(['auth:sanctum', 'signed'])->name('verification.verify');
+
+Route::post('/email/verification-notification', function (Request $request) {
+    $request->user()->sendEmailVerificationNotification();
+    return response()->json(['message' => 'Verification link sent!']);
+})->middleware(['auth:sanctum', 'throttle:6,1'])->name('verification.send');
+
+
+
   Route::post('/forgot-password', [ProfileController::class, 'forgotPassword']);
   Route::post('/verify-otp', [ProfileController::class, 'verifyOtp']);
   Route::post('/reset-password', [ProfileController::class, 'resetPassword']);
