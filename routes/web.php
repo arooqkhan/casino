@@ -17,6 +17,9 @@ use App\Http\Controllers\AdminController\ContactUsController;
 use App\Http\Controllers\AdminController\DashboardController;
 use App\Http\Controllers\AdminController\UserProfileController;
 use App\Http\Controllers\AdminController\TransactionHistoryController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use App\Models\TransactionHistory;
 
 Route::middleware('auth')->group(function () {
 
@@ -91,8 +94,6 @@ Route::post('/payment/checkout', [PaymentController::class, 'checkout'])->name('
 Route::get('/payment/success', [PaymentController::class, 'success'])->name('payment.success');
 Route::get('/payment/cancel', [PaymentController::class, 'cancel'])->name('payment.cancel');
 
-// Webhook (must be POST, set this URL in Stripe dashboard)
-Route::post('/stripe/webhook', [PaymentController::class, 'webhook']);
 
 
 Route::get('/clear', function () {
@@ -149,5 +150,44 @@ Route::get('/seed', function () {
         ], 500);
     }
 });
+
+
+
+
+// Route::post('/stripe/webhook', function (Request $request) {
+//     $payload = $request->getContent();
+//     $sigHeader = $request->header('Stripe-Signature');
+//     $secret = config('services.stripe.webhook_secret');
+
+//     try {
+//         $event = \Stripe\Webhook::constructEvent($payload, $sigHeader, $secret);
+//     } catch (\UnexpectedValueException $e) {
+//         return response('Invalid payload', 400);
+//     } catch (\Stripe\Exception\SignatureVerificationException $e) {
+//         return response('Invalid signature', 400);
+//     }
+
+//     if ($event->type === 'checkout.session.completed') {
+//         $session = $event->data->object;
+
+//         // ⚡ retrieve metadata
+//         $userId = $session->metadata->user_id ?? null;
+//         $amount = $session->amount_total / 100;
+
+//         if ($userId) {
+//             TransactionHistory::create([
+//                 'user_id'        => $userId,
+//                 'type'           => 'deposit',
+//                 'amount'         => $amount,
+//                 'status'         => 1,
+//                 'is_sent'        => 0,
+//                 'trans_type'     => 'stripe',
+//                 'payment_status' => 'approved',
+//             ]);
+//         }
+//     }
+
+//     return response('Webhook handled', 200);
+// });
 
 require __DIR__ . '/auth.php';
