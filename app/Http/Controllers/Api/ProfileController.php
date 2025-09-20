@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use App\Models\Card;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -183,12 +184,17 @@ class ProfileController extends Controller
             });
 
         // ✅ Response payload
+        // ✅ Bank/Card details
+        $bankDetails = Card::where('user_id', $user->id)->first();
+
+        // ✅ Response payload
         $data = [
-            'user'       => $user,
-            'packages'   => $packages,
-            'campaigns'  => $campaigns,
-            'bonuses'    => $bonuses,
-            'kyc_docs'   => $kycDocs, // 🆕 added
+            'user'        => $user,
+            'packages'    => $packages,
+            'campaigns'   => $campaigns,
+            'bonuses'     => $bonuses,
+            'kyc_docs'    => $kycDocs,
+            'bank_details' => $bankDetails, // 🆕 added
         ];
 
         return ApiHelper::sendResponse(true, "User retrieved successfully", $data, 200);

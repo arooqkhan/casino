@@ -79,7 +79,8 @@ class DepositController extends Controller
         ]);
         // ⚡ IMPORTANT: do NOT update balance here!
         // Webhook already does it.
-        return ApiHelper::sendResponse(true, "Payment successful, balance will be updated shortly", null, 200);
+        return redirect('/')->with('success', 'Payment successful! Your balance will be updated shortly.');
+        // return ApiHelper::sendResponse(true, "Payment successful, balance will be updated shortly", null, 200);
     }
 
     public function depositCancel()

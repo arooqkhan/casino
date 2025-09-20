@@ -53,7 +53,8 @@ Route::prefix('v1')->group(function () {
 
     Route::post('/profile-update', [ProfileController::class, 'updateProfile']);
 
-
+    Route::post('/bank-details', [WithDrawController::class, 'storeBankDetails']);
+    Route::get('/bank-details', [WithDrawController::class, 'getBankDetails']);
 
 
 
