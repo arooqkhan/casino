@@ -126,6 +126,8 @@ class ProfileController extends Controller
 
     public function profile(Request $request)
     {
+
+        
         $user = Auth::user();
 
         if (!$user) {
@@ -385,63 +387,90 @@ class ProfileController extends Controller
 
 
 
-    // Update profile
+    // Update profile api
 
-    public function updateProfile(Request $request)
-    {
-        $user = Auth::user();
+public function updateProfile(Request $request)
+{
+    $user = Auth::user();
 
-        if (!$user) {
-            return ApiHelper::sendResponse(false, "User not authenticated", null, 401);
-        }
-
-        try {
-            // Validation
-            $request->validate([
-                'first_name' => 'required|string|max:100',
-                'last_name'  => 'required|string|max:100',
-                'email'      => 'required|email|unique:users,email,' . $user->id,
-                'image'      => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            ]);
-
-            // Basic info update
-            $user->first_name = $request->first_name;
-            $user->last_name  = $request->last_name;
-            $user->email      = $request->email;
-
-            // Image handle
-            if ($request->hasFile('image')) {
-                // Purani image delete kar do agar hai
-                if ($user->image && File::exists(public_path($user->image))) {
-                    File::delete(public_path($user->image));
-                }
-
-                $image = $request->file('image');
-                $imageName = time() . '.' . $image->getClientOriginalExtension();
-                $uploadPath = public_path('uploads/profile');
-
-                // Agar folder exist nahi karta to bana lo
-                if (!File::exists($uploadPath)) {
-                    File::makeDirectory($uploadPath, 0777, true, true);
-                }
-
-                // Image move karo
-                $image->move($uploadPath, $imageName);
-
-                // Database me path save karo
-                $user->image = 'uploads/profile/' . $imageName;
-            }
-
-            $user->save();
-
-            // Response ke liye full image url dikhaye
-            if ($user->image) {
-                $user->image = asset($user->image);
-            }
-
-            return ApiHelper::sendResponse(true, "Profile updated successfully", $user, 200);
-        } catch (\Exception $e) {
-            return ApiHelper::sendResponse(false, "Something went wrong", $e->getMessage(), 500);
-        }
+    if (!$user) {
+        return ApiHelper::sendResponse(false, "User not authenticated", null, 401);
     }
+
+    try {
+        // Validation (aapke screenshot wale fields ke liye)
+        $request->validate([
+            'first_name'         => 'nullable|string|max:255',
+            'last_name'          => 'nullable|string|max:255',
+            'dob'                => 'nullable|date',
+            'address'            => 'nullable|string|max:255',
+            'email'              => 'nullable|email|unique:users,email,' . $user->id,
+            'image'              => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'province'           => 'nullable|string|max:255',
+            'postal_code'        => 'nullable|string|max:255',
+            'city'               => 'nullable|string|max:255',
+            'country'            => 'nullable|string|max:255',
+        ]);
+
+        // Saare input ek saath le lo
+        $data = $request->all();
+
+        // Password hash karna hoga
+        if ($request->filled('password')) {
+            $data['password'] = bcrypt($request->password);
+        }
+
+        // Profile image handle
+        if ($request->hasFile('image')) {
+            if ($user->image && File::exists(public_path($user->image))) {
+                File::delete(public_path($user->image));
+            }
+
+            $image = $request->file('image');
+            $imageName = 'profile_' . time() . '.' . $image->getClientOriginalExtension();
+            $uploadPath = public_path('uploads/profile');
+
+            if (!File::exists($uploadPath)) {
+                File::makeDirectory($uploadPath, 0777, true, true);
+            }
+
+            $image->move($uploadPath, $imageName);
+            $data['image'] = 'uploads/profile/' . $imageName;
+        }
+
+        // Avatar image handle
+        if ($request->hasFile('avatar')) {
+            if ($user->avatar && File::exists(public_path($user->avatar))) {
+                File::delete(public_path($user->avatar));
+            }
+
+            $avatar = $request->file('avatar');
+            $avatarName = 'avatar_' . time() . '.' . $avatar->getClientOriginalExtension();
+            $uploadPath = public_path('uploads/avatar');
+
+            if (!File::exists($uploadPath)) {
+                File::makeDirectory($uploadPath, 0777, true, true);
+            }
+
+            $avatar->move($uploadPath, $avatarName);
+            $data['avatar'] = 'uploads/avatar/' . $avatarName;
+        }
+
+        // User update with all request data
+        $user->update($data);
+
+        // Full URLs for response
+        if ($user->image) {
+            $user->image = asset($user->image);
+        }
+        if ($user->avatar) {
+            $user->avatar = asset($user->avatar);
+        }
+
+        return ApiHelper::sendResponse(true, "Profile updated successfully", $user, 200);
+    } catch (\Exception $e) {
+        return ApiHelper::sendResponse(false, "Something went wrong", $e->getMessage(), 500);
+    }
+}
+
 }
