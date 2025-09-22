@@ -387,7 +387,7 @@ class ProfileController extends Controller
 
 
 
-    // Update profile
+    // Update profile api
 
 public function updateProfile(Request $request)
 {
