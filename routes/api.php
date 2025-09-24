@@ -63,6 +63,8 @@ Route::prefix('v1')->group(function () {
 
     Route::get('/bonuses', [ApiBonusController::class, 'index']);
 
+    Route::post('/claim-bonus', [ApiBonusController::class, 'store']);
+
     Route::get('/campaigns', [ApiCampaignController::class, 'index']);
 
     Route::get('/packages', [ApiPackageController::class, 'index']);
@@ -92,6 +94,11 @@ Route::prefix('v1')->group(function () {
 
 
     Route::get('/faqs', [ApiFaqController::class, 'listApi']);
+
+
+
+    Route::get('/deposit', [DepositController::class, 'index']);
+
 
 
     // Chatify apis

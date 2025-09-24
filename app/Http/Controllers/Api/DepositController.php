@@ -87,4 +87,22 @@ class DepositController extends Controller
     {
         return ApiHelper::sendResponse(false, "Deposit canceled by user", null, 400);
     }
+
+
+   public function index(Request $request)
+{
+    try {
+        // Campaign ke sath creator aur subscribers load karna
+        $deposit = TransactionHistory::get();
+
+        return ApiHelper::sendResponse(true, "Deposit and Withdraw retrieved successfully", $deposit);
+
+    } catch (\Exception $e) {
+        return ApiHelper::sendResponse(false, "Something went wrong", $e->getMessage(), 500);
+    }
+}
+
+
+
+
 }
