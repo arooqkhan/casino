@@ -66,6 +66,52 @@ class ApiBonusController extends Controller
         ]);
     }
 
+
+
+    public function store(Request $request)
+{
+
+    try {
+        $validated = $request->validate([
+            'type' => 'required|string',
+            'campaign_id' => 'nullable|exists:campaigns,id',
+            'valid_from' => 'nullable|date',
+            'valid_until' => 'nullable|date|after_or_equal:valid_from',
+            'color' => 'required|string|max:20',
+            'shadow' => 'required|string|max:255',
+            'description' => 'nullable|string|max:255',
+        ]);
+
+        $bonus = Bonus::create($validated);
+
+        return ApiHelper::sendResponse(
+            true,
+            "Bonus created successfully!",
+            $bonus,
+            201
+        );
+
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        return ApiHelper::sendResponse(
+            false,
+            "Validation failed.",
+            $e->errors(),
+            422
+        );
+
+    } catch (\Exception $e) {
+        return ApiHelper::sendResponse(
+            false,
+            "Something went wrong.",
+            $e->getMessage(),
+            500
+        );
+    }
+}
+
+
+
+
     
 
 }

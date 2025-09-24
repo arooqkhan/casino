@@ -132,7 +132,7 @@ public function joinCampaign(Request $request)
 
 
 
-    public function success(Request $request)
+public function success(Request $request)
 {
     \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
 
@@ -147,19 +147,18 @@ public function joinCampaign(Request $request)
             $user->total_credit += $package->credit;
             $user->save();
 
-            // Redirect back to React dashboard
-           return redirect('http://localhost:5173/payment-success');
+            return redirect(config('services.frontend.url') . '/payment-success');
         }
 
-          return redirect('http://localhost:5173/payment-failed');
+        return redirect(config('services.frontend.url') . '/payment-failed');
     } catch (\Exception $e) {
-         return redirect('http://localhost:5173/payment-error?message=' . urlencode($e->getMessage()));
+        return redirect(config('services.frontend.url') . '/payment-error?message=' . urlencode($e->getMessage()));
     }
 }
 
 public function cancel()
 {
-    return redirect('http://localhost:3000/dashboard?status=cancel');
+    return redirect(config('services.frontend.url') . '/dashboard?status=cancel');
 }
 
 
