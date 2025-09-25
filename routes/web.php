@@ -190,4 +190,13 @@ Route::get('/seed', function () {
 //     return response('Webhook handled', 200);
 // });
 
+
+Route::get('/test-finalize', function () {
+    Artisan::call('campaigns:finalize');
+    return response()->json([
+        'status' => 'done',
+        'output' => Artisan::output(),
+    ]);
+});
+
 require __DIR__ . '/auth.php';
