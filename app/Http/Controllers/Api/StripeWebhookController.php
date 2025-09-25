@@ -19,7 +19,7 @@ class StripeWebhookController extends Controller
         $secret = config('services.stripe.webhook_secret');
         // $secret = "we_1S9OEiKrxuMCwUpjeoDKWmti";
 
-
+        Log::error("Stripe Webhook sec:", $secret);
         // 🔥 Always log the raw payload for debugging
         Log::info("Stripe Webhook received", [
             'payload' => $payload,
@@ -40,25 +40,25 @@ class StripeWebhookController extends Controller
 
             $userId = $session->metadata->user_id ?? null;
             $amount = $session->amount_total / 100;
+            $paymentIntentId = $session->payment_intent;
 
-            if ($userId) {
+            if ($userId && $paymentIntentId) {
                 $user = User::find($userId);
 
                 if ($user) {
-
-
-                    $user->balance += $amount;
-                    $user->save();
-
-                    // ✅ Avoid duplicate transaction
+                    // ✅ Avoid duplicate transaction using payment_intent
                     $exists = TransactionHistory::where('user_id', $user->id)
                         ->where('type', 'deposit')
                         ->where('trans_type', 'stripe')
-                        ->where('amount', $amount)
-                        ->whereDate('created_at', now()->toDateString())
+                        ->where('reference', $paymentIntentId) // <-- store unique intent
                         ->exists();
 
                     if (!$exists) {
+                        // Update balance
+                        $user->balance += $amount;
+                        $user->save();
+
+                        // Create transaction
                         TransactionHistory::create([
                             'user_id'        => $user->id,
                             'type'           => 'deposit',
@@ -67,14 +67,13 @@ class StripeWebhookController extends Controller
                             'is_sent'        => 0,
                             'trans_type'     => 'stripe',
                             'payment_status' => 'approved',
+                            'reference'      => $paymentIntentId, // <-- unique
                         ]);
-
-                        $user->balance += $amount;
-                        $user->save();
                     }
                 }
             }
         }
+
 
         return response('Webhook handled', 200);
     }
