@@ -147,7 +147,8 @@ public function success(Request $request)
             $user->total_credit += $package->credit;
             $user->save();
 
-            return redirect(config('services.frontend.url') . '/payment-success');
+            return redirect()->away('http://localhost:5173/my-account')
+    ->with('success', 'Payment successful! Your balance will be updated shortly.');
         }
 
         return redirect(config('services.frontend.url') . '/payment-failed');
