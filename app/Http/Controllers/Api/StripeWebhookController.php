@@ -43,7 +43,13 @@ class StripeWebhookController extends Controller
 
             if ($userId) {
                 $user = User::find($userId);
+
                 if ($user) {
+
+
+                    $user->balance += $amount;
+                    $user->save();
+
                     // ✅ Avoid duplicate transaction
                     $exists = TransactionHistory::where('user_id', $user->id)
                         ->where('type', 'deposit')
