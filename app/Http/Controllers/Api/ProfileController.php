@@ -161,16 +161,23 @@ class ProfileController extends Controller
         ->get();
 
     // ✅ Bonuses claimed
-    $bonuses = DB::table('bonus_users')
-        ->join('bonuses', 'bonus_users.bonus_id', '=', 'bonuses.id')
-        ->where('bonus_users.user_id', $user->id)
-        ->select(
-            'bonuses.id',
-            'bonuses.type',
-            'bonuses.description',
-            'bonus_users.time as claimed_at'
-        )
-        ->get();
+  $bonuses = DB::table('bonus_users')
+    ->join('bonuses', 'bonus_users.bonus_id', '=', 'bonuses.id')
+    ->where('bonus_users.user_id', $user->id)
+    ->select(
+        'bonuses.id',
+        'bonuses.type',
+        'bonuses.description',
+        'bonuses.valid_until',
+        'bonus_users.time as claimed_at'
+    )
+    ->get()
+    ->map(function ($bonus) {
+        $bonus->valid_until = $bonus->valid_until 
+            ? \Carbon\Carbon::parse($bonus->valid_until)->endOfDay()->toISOString()
+            : null;
+        return $bonus;
+    });
 
     // ✅ KYC Documents
     $kycDocs = DB::table('user_documents')
