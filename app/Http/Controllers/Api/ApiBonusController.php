@@ -15,6 +15,7 @@ class ApiBonusController extends Controller
 {
    public function index(Request $request)
 {
+    
     try {
         // agar tumhe pagination chahiye to:
         // $bonuses = Bonus::paginate(10);
