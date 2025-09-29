@@ -7,7 +7,9 @@ use App\Models\Bonus;
 use App\Models\BonusUser;
 use App\Helpers\ApiHelper;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class ApiBonusController extends Controller
 {
@@ -68,27 +70,49 @@ class ApiBonusController extends Controller
 
 
 
-    public function store(Request $request)
+public function claimBonus(Request $request)
 {
 
     try {
         $validated = $request->validate([
-            'type' => 'required|string',
-            'campaign_id' => 'nullable|exists:campaigns,id',
-            'valid_from' => 'nullable|date',
-            'valid_until' => 'nullable|date|after_or_equal:valid_from',
-            'color' => 'required|string|max:20',
-            'shadow' => 'required|string|max:255',
-            'description' => 'nullable|string|max:255',
+            'bonus_id' => 'required|exists:bonuses,id',
         ]);
 
-        $bonus = Bonus::create($validated);
+        $user = Auth::user();
+
+        if (!$user) {
+            return ApiHelper::sendResponse(false, "User not authenticated", null, 401);
+        }
+
+        // Check agar already claim kar chuka hai
+        $alreadyClaimed = DB::table('bonus_users')
+            ->where('user_id', $user->id)
+            ->where('bonus_id', $validated['bonus_id'])
+            ->first();
+
+        if ($alreadyClaimed) {
+            return ApiHelper::sendResponse(false, "Bonus already claimed.", null, 409);
+        }
+
+        // Insert bonus claim record
+        $bonusClaim = DB::table('bonus_users')->insertGetId([
+            'bonus_id' => $validated['bonus_id'],
+            'user_id'  => $user->id,
+            'time'     => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
 
         return ApiHelper::sendResponse(
             true,
-            "Bonus created successfully!",
-            $bonus,
-            201
+            "Bonus claimed successfully!",
+            [
+                'bonus_user_id' => $bonusClaim,
+                'bonus_id'      => $validated['bonus_id'],
+                'user_id'       => $user->id,
+                'claimed_at'    => now(),
+            ],
+   
         );
 
     } catch (\Illuminate\Validation\ValidationException $e) {
@@ -96,7 +120,7 @@ class ApiBonusController extends Controller
             false,
             "Validation failed.",
             $e->errors(),
-            422
+       
         );
 
     } catch (\Exception $e) {
@@ -104,10 +128,11 @@ class ApiBonusController extends Controller
             false,
             "Something went wrong.",
             $e->getMessage(),
-            500
+      
         );
     }
 }
+
 
 
 

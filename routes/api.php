@@ -63,7 +63,7 @@ Route::prefix('v1')->group(function () {
 
     Route::get('/bonuses', [ApiBonusController::class, 'index']);
 
-    Route::post('/claim-bonus', [ApiBonusController::class, 'store']);
+    Route::post('/claim-bonus', [ApiBonusController::class, 'claimBonus']);
 
     Route::get('/campaigns', [ApiCampaignController::class, 'index']);
 
