@@ -19,12 +19,14 @@ class StripeWebhookController extends Controller
         $secret = config('services.stripe.webhook_secret');
         // $secret = "we_1S9OEiKrxuMCwUpjeoDKWmti";
 
-        Log::error("Stripe Webhook sec:", $secret);
-        // 🔥 Always log the raw payload for debugging
+        // Log incoming request
         Log::info("Stripe Webhook received", [
-            'payload' => $payload,
-            'headers' => $request->headers->all(),
+            'signature' => $sigHeader,
+            'payload'   => $payload,
         ]);
+
+        // Debug secret (only while testing!)
+        Log::debug("Stripe Webhook secret used", ['secret' => $secret]);
         try {
             $event = Webhook::constructEvent($payload, $sigHeader, $secret);
         } catch (\UnexpectedValueException $e) {
