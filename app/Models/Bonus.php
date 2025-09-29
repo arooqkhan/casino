@@ -16,6 +16,14 @@ class Bonus extends Model
         'description',
     ];
 
+       protected $casts = [
+        'valid_from'  => 'datetime',
+        'valid_until' => 'datetime',
+        'created_at'  => 'datetime',
+        'updated_at'  => 'datetime',
+    ];
+    
+
     public function campaign()
     {
         return $this->belongsTo(Campaign::class);
