@@ -18,6 +18,7 @@ class ApiPackagePurchaseController extends Controller
 {
     public function createCheckout(Request $request)
     {
+       
         $validated = $request->validate([
             'package_id' => 'required|exists:packages,id',
 
@@ -127,6 +128,7 @@ public function joinCampaign(Request $request)
 
        return ApiHelper::sendResponse(true, "Campaign list", $users);
     }
+    
 
 
 
