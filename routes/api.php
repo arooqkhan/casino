@@ -32,9 +32,9 @@ Route::prefix('v1')->group(function () {
   // Email verification routes
   Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
     $request->fulfill();
-return redirect()->away('http://localhost:5173/my-account')
-        ->with('success', 'Your email has been verified successfully!');
-})->middleware(['auth', 'signed'])->name('verification.verify');
+    return redirect()->away('http://localhost:5173/my-account')
+      ->with('success', 'Your email has been verified successfully!');
+  })->middleware(['auth', 'signed'])->name('verification.verify');
 
   Route::post('/email/verification-notification', function (Request $request) {
     $request->user()->sendEmailVerificationNotification();
@@ -78,7 +78,7 @@ return redirect()->away('http://localhost:5173/my-account')
 
 
     Route::get('/stripe/success', [ApiPackagePurchaseController::class, 'success'])->name('stripe.success');
-Route::get('/stripe/cancel', [ApiPackagePurchaseController::class, 'cancel'])->name('stripe.cancel');
+    Route::get('/stripe/cancel', [ApiPackagePurchaseController::class, 'cancel'])->name('stripe.cancel');
 
 
     Route::post('/joinCampaign', [ApiPackagePurchaseController::class, 'joinCampaign']);
