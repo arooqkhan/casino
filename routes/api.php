@@ -32,8 +32,7 @@ Route::prefix('v1')->group(function () {
   // Email verification routes
   Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
     $request->fulfill();
-    return redirect()->away('http://localhost:5173/my-account')
-      ->with('success', 'Your email has been verified successfully!');
+    return redirect()->away('http://localhost:5173');
   })->middleware(['auth', 'signed'])->name('verification.verify');
 
   Route::post('/email/verification-notification', function (Request $request) {
