@@ -21,6 +21,9 @@ use App\Models\TransactionHistory;
 use App\Http\Controllers\Api\StripeWebhookController;
 use App\Http\Controllers\Api\WithDrawController;
 use App\Models\Campaign;
+use App\Models\User;
+use Illuminate\Auth\Events\Verified;
+use Illuminate\Support\Facades\Redirect;
 
 Route::prefix('v1')->group(function () {
 
@@ -32,20 +35,32 @@ Route::prefix('v1')->group(function () {
   // Email verification routes
   // Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
   //   $request->fulfill();
-  //   // return redirect()->away('http://localhost:5173');
-  //   return redirect()->away(config('app.frontend_url') . '?verified=success');
+  //   return redirect()->away('http://localhost:5173/my-account')
+  //     ->with('success', 'Your email has been verified successfully!');
   // })->middleware(['auth', 'signed'])->name('verification.verify');
 
 
 
-  Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
-    $request->fulfill();
-
-    // ✅ Redirect to frontend after verification
-    return redirect()->away(config('app.frontend_url'));
-  })->middleware(['signed'])->name('verification.verify');
 
 
+
+  Route::get('/email/verify/{id}/{hash}', function ($id, $hash) {
+    $user = User::findOrFail($id);
+
+    // Verify hash
+    if (! hash_equals(sha1($user->getEmailForVerification()), $hash)) {
+      abort(403, 'Invalid verification link.');
+    }
+
+    // Mark verified if not already
+    if (! $user->hasVerifiedEmail()) {
+      $user->markEmailAsVerified();
+      event(new Verified($user));
+    }
+
+    // ✅ Redirect only
+    return Redirect::away(config('app.frontend_url'));
+  })->middleware('signed')->name('verification.verify');
 
 
   Route::post('/email/verification-notification', function (Request $request) {

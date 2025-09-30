@@ -11,6 +11,7 @@ use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Notifications\Messages\MailMessage;
+use App\Notifications\CustomVerifyEmail;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -94,5 +95,13 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsToMany(Bonus::class, 'bonus_users', 'user_id', 'bonus_id')
             ->withPivot('time')
             ->withTimestamps();
+    }
+
+
+
+
+    public function sendEmailVerificationNotification()
+    {
+        $this->notify(new CustomVerifyEmail);
     }
 }
