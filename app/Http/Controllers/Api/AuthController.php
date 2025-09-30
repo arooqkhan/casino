@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 use App\Models\User;
-
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
@@ -49,6 +49,8 @@ class AuthController extends Controller
             'password' => bcrypt($request->password),
         ]);
 
+        // Fire event → sends verification email
+        event(new Registered($user));
         $token = $user->createToken('api-token')->plainTextToken;
 
         return response()->json([

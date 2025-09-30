@@ -9,6 +9,8 @@ use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Auth\Notifications\VerifyEmail;
+use Illuminate\Notifications\Messages\MailMessage;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -64,39 +66,33 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
 
-   
+
 
 
     public function packages()
-{
-    return $this->belongsToMany(Package::class, 'package_user')
-                ->withPivot('time') // extra column bhi access hoga
-                ->withTimestamps();  // created_at, updated_at
-}
-
-
- public function campaigns()
-{
-    return $this->belongsToMany(Campaign::class, 'campaign_subscribe')
-                ->withTimestamps();
-}
-
-public function subscribedCampaigns()
-{
-    return $this->belongsToMany(Campaign::class, 'campaign_subscribe', 'user_id', 'campaign_id');
-}
-
-
-public function bonuses()
     {
-        return $this->belongsToMany(Bonus::class, 'bonus_users', 'user_id', 'bonus_id')
-                    ->withPivot('time')
-                    ->withTimestamps();
+        return $this->belongsToMany(Package::class, 'package_user')
+            ->withPivot('time') // extra column bhi access hoga
+            ->withTimestamps();  // created_at, updated_at
     }
 
 
+    public function campaigns()
+    {
+        return $this->belongsToMany(Campaign::class, 'campaign_subscribe')
+            ->withTimestamps();
+    }
+
+    public function subscribedCampaigns()
+    {
+        return $this->belongsToMany(Campaign::class, 'campaign_subscribe', 'user_id', 'campaign_id');
+    }
 
 
-
-
+    public function bonuses()
+    {
+        return $this->belongsToMany(Bonus::class, 'bonus_users', 'user_id', 'bonus_id')
+            ->withPivot('time')
+            ->withTimestamps();
+    }
 }

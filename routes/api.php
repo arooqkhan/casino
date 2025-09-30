@@ -30,11 +30,23 @@ Route::prefix('v1')->group(function () {
   Route::post('/register', [ProfileController::class, 'register']);
 
   // Email verification routes
+  // Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+  //   $request->fulfill();
+  //   // return redirect()->away('http://localhost:5173');
+  //   return redirect()->away(config('app.frontend_url') . '?verified=success');
+  // })->middleware(['auth', 'signed'])->name('verification.verify');
+
+
+
   Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
     $request->fulfill();
-    // return redirect()->away('http://localhost:5173');
-    return redirect()->away(config('app.frontend_url') . '?verified=success');
-  })->middleware(['auth', 'signed'])->name('verification.verify');
+
+    // ✅ Redirect to frontend after verification
+    return redirect()->away(config('app.frontend_url'));
+  })->middleware(['signed'])->name('verification.verify');
+
+
+
 
   Route::post('/email/verification-notification', function (Request $request) {
     $request->user()->sendEmailVerificationNotification();
