@@ -28,17 +28,15 @@ class AuthServiceProvider extends ServiceProvider
 
         // inside boot() method
         VerifyEmail::createUrlUsing(function ($notifiable) {
-            $frontendUrl = config('app.frontend_url', env('FRONTEND_URL'));
-
+            $frontendUrl = config('app.frontend_url');
             $temporarySignedUrl = URL::temporarySignedRoute(
-                'verification.verify',  // this is your backend route name
+                'verification.verify',
                 now()->addMinutes(60),
                 [
                     'id'   => $notifiable->getKey(),
                     'hash' => sha1($notifiable->getEmailForVerification()),
                 ]
             );
-
             return $frontendUrl . '/verify-email?url=' . urlencode($temporarySignedUrl);
         });
         $this->registerPolicies();
