@@ -18,18 +18,35 @@ class ApiPackagePurchaseController extends Controller
 {
     public function createCheckout(Request $request)
     {
-       
+
         $validated = $request->validate([
             'package_id' => 'required|exists:packages,id',
 
         ]);
 
-        $user = Auth::user();
 
+
+        $user = Auth::user();
+        $balance = $user->balance;
         $package = Package::findOrFail($validated['package_id']);
 
-         $user->total_credit += $package->credit;
-         $user->save();
+        // check credit
+        if ($user->total_credit < $package->credit) {
+            return ApiHelper::sendResponse(false, "Insufficient credits", '', 400);
+        }
+
+        // check balance
+        if ($balance < $package->price) {
+            return ApiHelper::sendResponse(false, "Insufficient balance", '', 400);
+        }
+
+
+        // $user->total_credit += $package->credit;
+        // $user->save();
+
+        $user->total_credit += $package->credit;
+        $user->save();
+
 
         try {
             Stripe::setApiKey(config('services.stripe.secret'));
@@ -67,103 +84,99 @@ class ApiPackagePurchaseController extends Controller
 
 
 
-public function joinCampaign(Request $request)
-{
-    $user = Auth::user();
+    public function joinCampaign(Request $request)
+    {
+        $user = Auth::user();
 
-    // ✅ Find PackageUser entry
-    $packageUser = PackageUser::where('user_id', $user->id)->first();
+        // ✅ Find PackageUser entry
+        $packageUser = PackageUser::where('user_id', $user->id)->first();
 
-    if (!$packageUser) {
-        return ApiHelper::sendResponse(false, "Package Not Found", '', 404);
+        if (!$packageUser) {
+            return ApiHelper::sendResponse(false, "Package Not Found", '', 404);
+        }
+
+        // ✅ Get the package using package_id
+        $package = Package::find($packageUser->package_id);
+
+        if (!$package) {
+            return ApiHelper::sendResponse(false, "Package details not found", '', 404);
+        }
+
+        // ✅ Check if user has enough credits
+        if ($user->total_credit < $package->credit) {
+            return ApiHelper::sendResponse(false, "Insufficient credits", '', 400);
+        }
+
+        // ✅ Deduct credits
+        $user->total_credit -= $package->credit;
+        $user->save();
+
+        // ✅ campaign_id from request body
+        $campaignId = $request->input('campaign_id');
+
+        if (!$campaignId) {
+            return ApiHelper::sendResponse(false, "Campaign ID is required", '', 422);
+        }
+
+        try {
+            // ✅ Save in campaign_subscribe
+            $subscribe = CampaignSubscribe::create([
+                'user_id'     => $user->id,
+                'campaign_id' => $campaignId,
+            ]);
+
+            return ApiHelper::sendResponse(true, "Package successfully campaign joined", [
+                'subscription'     => $subscribe,
+                'remaining_credit' => $user->total_credit,
+            ], 200);
+        } catch (\Exception $e) {
+            return ApiHelper::sendResponse(false, "Failed to join campaign", $e->getMessage(), 500);
+        }
     }
 
-    // ✅ Get the package using package_id
-    $package = Package::find($packageUser->package_id);
 
-    if (!$package) {
-        return ApiHelper::sendResponse(false, "Package details not found", '', 404);
-    }
-
-    // ✅ Check if user has enough credits
-    if ($user->total_credit < $package->credit) {
-        return ApiHelper::sendResponse(false, "Insufficient credits", '', 400);
-    }
-
-    // ✅ Deduct credits
-    $user->total_credit -= $package->credit;
-    $user->save();
-
-    // ✅ campaign_id from request body
-    $campaignId = $request->input('campaign_id'); 
-
-    if (!$campaignId) {
-        return ApiHelper::sendResponse(false, "Campaign ID is required", '', 422);
-    }
-
-    try {
-        // ✅ Save in campaign_subscribe
-        $subscribe = CampaignSubscribe::create([
-            'user_id'     => $user->id,
-            'campaign_id' => $campaignId,
-        ]);
-
-        return ApiHelper::sendResponse(true, "Package successfully campaign joined", [
-            'subscription'     => $subscribe,
-            'remaining_credit' => $user->total_credit,
-        ], 200);
-
-    } catch (\Exception $e) {
-        return ApiHelper::sendResponse(false, "Failed to join campaign", $e->getMessage(), 500);
-    }
-}
-
-
- public function getAllCompaign()
+    public function getAllCompaign()
     {
         // Get all users with their subscribed campaigns
         $users = User::with(['campaigns' => function ($query) {
             $query->select('campaigns.id', 'campaigns.name', 'campaigns.status');
-        }])->get(['id', 'first_name','last_name', 'email']);
+        }])->get(['id', 'first_name', 'last_name', 'email']);
 
-       return ApiHelper::sendResponse(true, "Campaign list", $users);
+        return ApiHelper::sendResponse(true, "Campaign list", $users);
     }
-    
 
 
 
 
 
-public function success(Request $request)
-{
-    \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
 
-    try {
-        $session = \Stripe\Checkout\Session::retrieve($request->session_id);
+    public function success(Request $request)
+    {
+        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
 
-        if ($session->payment_status === 'paid') {
-            $user    = User::findOrFail($request->user_id);
-            $package = Package::findOrFail($request->package_id);
+        try {
+            $session = \Stripe\Checkout\Session::retrieve($request->session_id);
 
-            // ✅ Add credits only after success
-            $user->total_credit += $package->credit;
-            $user->save();
+            if ($session->payment_status === 'paid') {
+                $user    = User::findOrFail($request->user_id);
+                $package = Package::findOrFail($request->package_id);
 
-            return redirect()->away('http://localhost:5173/my-account')
-    ->with('success', 'Payment successful! Your balance will be updated shortly.');
+                // ✅ Add credits only after success
+                $user->total_credit += $package->credit;
+                $user->save();
+
+                return redirect()->away('http://localhost:5173/my-account')
+                    ->with('success', 'Payment successful! Your balance will be updated shortly.');
+            }
+
+            return redirect(config('services.frontend.url') . '/payment-failed');
+        } catch (\Exception $e) {
+            return redirect(config('services.frontend.url') . '/payment-error?message=' . urlencode($e->getMessage()));
         }
-
-        return redirect(config('services.frontend.url') . '/payment-failed');
-    } catch (\Exception $e) {
-        return redirect(config('services.frontend.url') . '/payment-error?message=' . urlencode($e->getMessage()));
     }
-}
 
-public function cancel()
-{
-    return redirect(config('services.frontend.url') . '/dashboard?status=cancel');
-}
-
-
-
+    public function cancel()
+    {
+        return redirect(config('services.frontend.url') . '/dashboard?status=cancel');
+    }
 }
