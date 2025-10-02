@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\ApiHelper;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -37,6 +38,45 @@ class StripeWebhookController extends Controller
             return response('Invalid signature', 400);
         }
 
+        // if ($event->type === 'checkout.session.completed') {
+        //     $session = $event->data->object;
+
+        //     $userId = $session->metadata->user_id ?? null;
+        //     $amount = $session->amount_total / 100;
+        //     $paymentIntentId = $session->payment_intent;
+
+        //     if ($userId && $paymentIntentId) {
+        //         $user = User::find($userId);
+
+        //         if ($user) {
+        //             // ✅ Avoid duplicate transaction using payment_intent
+        //             $exists = TransactionHistory::where('user_id', $user->id)
+        //                 ->where('type', 'deposit')
+        //                 ->where('trans_type', 'stripe')
+        //                 ->where('reference', $paymentIntentId) // <-- store unique intent
+        //                 ->exists();
+
+        //             if (!$exists) {
+        //                 // Update balance
+        //                 $user->balance += $amount;
+        //                 $user->save();
+
+        //                 // Create transaction
+        //                 TransactionHistory::create([
+        //                     'user_id'        => $user->id,
+        //                     'type'           => 'deposit',
+        //                     'amount'         => $amount,
+        //                     'status'         => 1,
+        //                     'is_sent'        => 0,
+        //                     'trans_type'     => 'stripe',
+        //                     'payment_status' => 'approved',
+        //                     'reference'      => $paymentIntentId, // <-- unique
+        //                 ]);
+        //             }
+        //         }
+        //     }
+        // }
+
         if ($event->type === 'checkout.session.completed') {
             $session = $event->data->object;
 
@@ -44,23 +84,31 @@ class StripeWebhookController extends Controller
             $amount = $session->amount_total / 100;
             $paymentIntentId = $session->payment_intent;
 
+            Log::info("Stripe Webhook Checkout Completed", [
+                'user_id' => $userId,
+                'amount'  => $amount,
+                'payment_intent' => $paymentIntentId,
+            ]);
+
             if ($userId && $paymentIntentId) {
                 $user = User::find($userId);
 
                 if ($user) {
-                    // ✅ Avoid duplicate transaction using payment_intent
+                    Log::info("User found, updating balance", [
+                        'before_balance' => $user->balance,
+                        'add_amount' => $amount,
+                    ]);
+
                     $exists = TransactionHistory::where('user_id', $user->id)
                         ->where('type', 'deposit')
                         ->where('trans_type', 'stripe')
-                        ->where('reference', $paymentIntentId) // <-- store unique intent
+                        ->where('reference', $paymentIntentId)
                         ->exists();
 
                     if (!$exists) {
-                        // Update balance
                         $user->balance += $amount;
                         $user->save();
 
-                        // Create transaction
                         TransactionHistory::create([
                             'user_id'        => $user->id,
                             'type'           => 'deposit',
@@ -69,14 +117,25 @@ class StripeWebhookController extends Controller
                             'is_sent'        => 0,
                             'trans_type'     => 'stripe',
                             'payment_status' => 'approved',
-                            'reference'      => $paymentIntentId, // <-- unique
+                            'reference'      => $paymentIntentId,
+                        ]);
+
+                        Log::info("Stripe deposit recorded", [
+                            'user_id' => $user->id,
+                            'new_balance' => $user->balance,
+                        ]);
+                    } else {
+                        Log::warning("Stripe deposit already exists", [
+                            'user_id' => $user->id,
+                            'reference' => $paymentIntentId,
                         ]);
                     }
+                } else {
+                    Log::error("User not found for Stripe deposit", ['user_id' => $userId]);
                 }
             }
         }
 
-
-        return response('Webhook handled', 200);
+        return ApiHelper::sendResponse(true, "Webhook handled", '', 200);
     }
 }
