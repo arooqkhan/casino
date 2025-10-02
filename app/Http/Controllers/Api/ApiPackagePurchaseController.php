@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Stripe\Checkout\Session;
 use App\Models\CampaignSubscribe;
 use App\Http\Controllers\Controller;
+use App\Models\Campaign;
 use Illuminate\Support\Facades\Auth;
 
 class ApiPackagePurchaseController extends Controller
@@ -91,9 +92,14 @@ class ApiPackagePurchaseController extends Controller
         // ✅ Find PackageUser entry
         $packageUser = PackageUser::where('user_id', $user->id)->first();
 
-        if (!$packageUser) {
-            return ApiHelper::sendResponse(false, "Package Not Found", '', 404);
+        $package = Package::where('user_id', $user->id)->first();
+        $campaignId = $request->input('campaign_id');
+        $campaign = Campaign::where('id', $campaignId)->first();
+
+        if ($user->total_credit < $campaign->credit) {
+            return ApiHelper::sendResponse(false, "Insufficient credits", '', 400);
         }
+
 
         // ✅ Get the package using package_id
         $package = Package::find($packageUser->package_id);
@@ -110,9 +116,6 @@ class ApiPackagePurchaseController extends Controller
         // ✅ Deduct credits
         $user->total_credit -= $package->credit;
         $user->save();
-
-        // ✅ campaign_id from request body
-        $campaignId = $request->input('campaign_id');
 
         if (!$campaignId) {
             return ApiHelper::sendResponse(false, "Campaign ID is required", '', 422);
