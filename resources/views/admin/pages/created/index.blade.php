@@ -101,11 +101,11 @@
                         
 
                             <td class="text-center">
-                                <a href="{{ route('cards.edit', $card->id) }}" class="btn btn-primary btn-sm btn-circle">
+                                <a href="{{ route('createds.edit', $card->id) }}" class="btn btn-primary btn-sm btn-circle">
                                     <i class="fas fa-edit"></i>
                                 </a>
 
-                                <form action="{{ route('cards.destroy', $card->id) }}" method="POST" style="display:inline;" class="delete-form">
+                                <form action="{{ route('createds.destroy', $card->id) }}" method="POST" style="display:inline;" class="delete-form">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-danger btn-sm btn-circle">
