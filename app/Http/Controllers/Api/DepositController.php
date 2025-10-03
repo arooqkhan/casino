@@ -93,18 +93,13 @@ class DepositController extends Controller
             return ApiHelper::sendResponse(false, "Missing session_id", null, 400);
         }
 
-        // Stripe session IDs always start with "cs_"
-        if (strpos($sessionId, 'cs_') !== 0) {
-            Log::error("❌ Invalid session_id received", ['session_id' => $sessionId]);
-            return ApiHelper::sendResponse(false, "Invalid session_id", null, 400);
-        }
 
-        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+
+        Stripe::setApiKey(config('services.stripe.secret'));
+        $session = Session::retrieve($sessionId);
 
         try {
-            $session = \Stripe\Checkout\Session::retrieve($sessionId);
-
-            Log::info('✅ Stripe Success ', [
+            Log::info('✅ ssss Success ', [
                 'session_id' => $session->id,
                 'status'     => $session->status,
                 'payment_status' => $session->payment_status,

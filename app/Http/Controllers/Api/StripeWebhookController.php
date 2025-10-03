@@ -23,6 +23,7 @@ class StripeWebhookController extends Controller
         Log::info("Stripe Webhook received", [
             'signature' => $sigHeader,
             'payload'   => $payload,
+            'secreteee'   => $secret,
         ]);
 
         // Debug secret (only while testing!)
