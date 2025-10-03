@@ -104,14 +104,14 @@ class DepositController extends Controller
         try {
             $session = \Stripe\Checkout\Session::retrieve($sessionId);
 
-            Log::info('✅ Stripe Deposit Success Callback', [
+            Log::info('✅ Stripe Success ', [
                 'session_id' => $session->id,
                 'status'     => $session->status,
                 'payment_status' => $session->payment_status,
             ]);
 
             // Do NOT update balance here → your webhook already does that
-            return redirect()->away('http://localhost:5173/my-account')
+            return redirect()->away('https://megaspinn.vercel.app/my-account')
                 ->with('success', 'Payment successful! Your balance will be updated shortly.');
         } catch (\Exception $e) {
             Log::error("❌ Failed to retrieve Stripe session", ['error' => $e->getMessage()]);
