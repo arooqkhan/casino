@@ -148,14 +148,24 @@ class StripeWebhookController extends Controller
         $sigHeader = $request->header('Stripe-Signature');
         $secret    = config('services.stripe.webhook_secret');
 
-        // 1. Log incoming webhook
-        Log::info("Stripe Webhook received", [
-            'signature' => $sigHeader,
-            'payload'   => $payload,
-        ]);
+        // Log secret carefully (array required, not string)
+        Log::info("Stripe Webhook Secret", ['secret' => $secret]);
 
         try {
             $event = Webhook::constructEvent($payload, $sigHeader, $secret);
+
+            // Log the full event (this has the `type`)
+            Log::info("Stripe Webhook Event", [
+                'id'       => $event->id,
+                'type'     => $event->type,
+                'livemode' => $event->livemode,
+            ]);
+
+            // Log raw incoming webhook for debugging
+            Log::info("Stripe Webhook received", [
+                'signature' => $sigHeader,
+                'payload'   => $payload,
+            ]);
         } catch (\UnexpectedValueException $e) {
             Log::error("Stripe Webhook error: Invalid payload");
             return response('Invalid payload', 400);
@@ -164,24 +174,29 @@ class StripeWebhookController extends Controller
             return response('Invalid signature', 400);
         }
 
-        // 2. Handle checkout.session.completed
+        // ✅ Correct: check event->type
         if ($event->type === 'checkout.session.completed') {
             $session = $event->data->object;
 
-            // ✅ Extract values from metadata
+            // Log session info
+            Log::info("Stripe Session Info", [
+                'session_id'     => $session->id,
+                'status'         => $session->status,
+                'payment_status' => $session->payment_status,
+                'metadata'       => $session->metadata,
+            ]);
+
+            // Extract values
             $userId = $session->metadata->user_id ?? null;
             $amountMeta = $session->metadata->amount ?? null;
-
-            // Convert amount to number
             $amount = $amountMeta ? (float)$amountMeta : ($session->amount_total / 100);
-
             $paymentIntentId = $session->payment_intent;
 
             Log::info("Stripe Webhook Metadata Extracted", [
-                'user_id' => $userId,
-                'amount'  => $amount,
+                'user_id'        => $userId,
+                'amount'         => $amount,
                 'payment_intent' => $paymentIntentId,
-                'status' => $session->status,
+                'status'         => $session->status,
                 'payment_status' => $session->payment_status,
             ]);
 
@@ -212,12 +227,12 @@ class StripeWebhookController extends Controller
                             ]);
 
                             Log::info("✅ Stripe deposit recorded", [
-                                'user_id' => $user->id,
+                                'user_id'     => $user->id,
                                 'new_balance' => $user->balance,
                             ]);
                         } else {
                             Log::warning("⚠️ Stripe deposit already exists", [
-                                'user_id' => $user->id,
+                                'user_id'   => $user->id,
                                 'reference' => $paymentIntentId,
                             ]);
                         }
@@ -227,12 +242,11 @@ class StripeWebhookController extends Controller
                 }
             } else {
                 Log::warning("⚠️ Stripe session not completed/paid", [
-                    'status' => $session->status,
+                    'status'         => $session->status,
                     'payment_status' => $session->payment_status,
                 ]);
             }
         }
-
 
         // Always return 200 to Stripe
         return response('Webhook handled', 200);
