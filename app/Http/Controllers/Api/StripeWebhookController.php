@@ -174,33 +174,22 @@ class StripeWebhookController extends Controller
             return response('Invalid signature', 400);
         }
 
-        // ✅ Correct: check event->type
         if ($event->type === 'checkout.session.completed') {
             $session = $event->data->object;
 
-            // Log session info
-            Log::info("Stripe Session Info", [
+            Log::info("🔥 Stripe checkout.session.completed triggered", [
                 'session_id'     => $session->id,
                 'status'         => $session->status,
                 'payment_status' => $session->payment_status,
                 'metadata'       => $session->metadata,
             ]);
 
-            // Extract values
             $userId = $session->metadata->user_id ?? null;
             $amountMeta = $session->metadata->amount ?? null;
             $amount = $amountMeta ? (float)$amountMeta : ($session->amount_total / 100);
             $paymentIntentId = $session->payment_intent;
 
-            Log::info("Stripe Webhook Metadata Extracted", [
-                'user_id'        => $userId,
-                'amount'         => $amount,
-                'payment_intent' => $paymentIntentId,
-                'status'         => $session->status,
-                'payment_status' => $session->payment_status,
-            ]);
-
-            if ($session->status === 'complete' && $session->payment_status === 'paid') {
+            if ($session->payment_status === 'paid') {
                 if ($userId && $paymentIntentId) {
                     $user = User::find($userId);
 
@@ -230,25 +219,10 @@ class StripeWebhookController extends Controller
                                 'user_id'     => $user->id,
                                 'new_balance' => $user->balance,
                             ]);
-                        } else {
-                            Log::warning("⚠️ Stripe deposit already exists", [
-                                'user_id'   => $user->id,
-                                'reference' => $paymentIntentId,
-                            ]);
                         }
-                    } else {
-                        Log::error("❌ User not found for Stripe deposit", ['user_id' => $userId]);
                     }
                 }
-            } else {
-                Log::warning("⚠️ Stripe session not completed/paid", [
-                    'status'         => $session->status,
-                    'payment_status' => $session->payment_status,
-                ]);
             }
         }
-
-        // Always return 200 to Stripe
-        return response('Webhook handled', 200);
     }
 }
