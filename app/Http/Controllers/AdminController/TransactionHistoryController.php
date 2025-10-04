@@ -22,10 +22,12 @@ class TransactionHistoryController extends Controller
     }
 
 
-    public function approve($id)
+    public function approve(Request $request, $id)
     {
+        $user = auth()->user();
+        $user->balance -= $request->amount;
+        $user->save();
 
-     
         $transaction = TransactionHistory::findOrFail($id);
         $transaction->update([
             'payment_status' => 'approved',
@@ -36,11 +38,11 @@ class TransactionHistoryController extends Controller
         return back()->with('success', 'Withdrawal approved and marked as sent!');
     }
 
-    public function reject(Request $request , $id)
+    public function reject(Request $request, $id)
     {
         $user = auth()->user();
-          $user->balance += $request->amount;
-            $user->save();
+        $user->balance += $request->amount;
+        $user->save();
         $transaction = TransactionHistory::findOrFail($id);
         $transaction->update([
             'payment_status' => 'pending', // Or maybe 'rejected' if you add that
