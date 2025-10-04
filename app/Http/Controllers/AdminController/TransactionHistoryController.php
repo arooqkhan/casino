@@ -71,7 +71,7 @@ class TransactionHistoryController extends Controller
         $user->balance += $transaction->amount;
         $user->save();
         $transaction->update([
-            'payment_status' => 'pending', // Or maybe 'rejected' if you add that
+            'payment_status' => 'rejected', // Or maybe 'rejected' if you add that
             'status' => 2,
             'is_sent' => 2,
             'updated_at' => now(), // force update
