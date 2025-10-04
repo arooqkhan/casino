@@ -17,37 +17,83 @@ use Illuminate\Support\Facades\Auth;
 
 class ApiPackagePurchaseController extends Controller
 {
+    // public function createCheckout(Request $request)
+    // {
+
+    //     $validated = $request->validate([
+    //         'package_id' => 'required|exists:packages,id',
+
+    //     ]);
+
+
+
+    //     $user = Auth::user();
+    //     $balance = $user->balance;
+    //     $package = Package::findOrFail($validated['package_id']);
+
+    //     // check credit
+    //     // if ($user->total_credit < $package->credit) {
+    //     //     return ApiHelper::sendResponse(false, "Insufficient credits", '', 400);
+    //     // }
+
+    //     // check balance
+    //     if ($balance < $package->price) {
+    //         return ApiHelper::sendResponse(false, "Insufficient balance", '', 400);
+    //     }
+
+    //     $user->total_credit += $package->credit;
+    //     $user->save();
+
+    //     //educt balance
+    //     $user->balance -= $package->price;
+    //     $user->save();
+
+
+    //     try {
+    //         Stripe::setApiKey(config('services.stripe.secret'));
+
+    //         $session = Session::create([
+    //             'payment_method_types' => ['card'],
+    //             'line_items' => [[
+    //                 'price_data' => [
+    //                     'currency'     => 'usd',
+    //                     'product_data' => [
+    //                         'name' => $package->name,
+    //                     ],
+    //                     'unit_amount'  => $package->price * 100, // cents
+    //                 ],
+    //                 'quantity' => 1,
+    //             ]],
+    //             'mode' => 'payment',
+    //             'success_url' => 'https://megaspinn.vercel.app/my-account',
+    //             'cancel_url' => url('/api/stripe/cancel'),
+    //         ]);
+
+    //         return response()->json([
+    //             'success'      => true,
+    //             'checkout_url' => $session->url,
+    //         ]);
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Stripe error: ' . $e->getMessage(),
+    //         ], 500);
+    //     }
+    // }
+
     public function createCheckout(Request $request)
     {
-
         $validated = $request->validate([
             'package_id' => 'required|exists:packages,id',
-
         ]);
 
-
-
-        $user = Auth::user();
-        $balance = $user->balance;
+        $user    = Auth::user();
         $package = Package::findOrFail($validated['package_id']);
 
-        // check credit
-        // if ($user->total_credit < $package->credit) {
-        //     return ApiHelper::sendResponse(false, "Insufficient credits", '', 400);
-        // }
-
-        // check balance
-        if ($balance < $package->price) {
+        // check balance before allowing checkout
+        if ($user->balance < $package->price) {
             return ApiHelper::sendResponse(false, "Insufficient balance", '', 400);
         }
-
-
-        // $user->total_credit += $package->credit;
-        // $user->save();
-
-        $user->total_credit += $package->credit;
-        $user->save();
-
 
         try {
             Stripe::setApiKey(config('services.stripe.secret'));
@@ -65,7 +111,11 @@ class ApiPackagePurchaseController extends Controller
                     'quantity' => 1,
                 ]],
                 'mode' => 'payment',
-                'success_url' => route('stripe.success'),
+                'success_url' => route('stripe.success', [
+                    'session_id' => '{CHECKOUT_SESSION_ID}',
+                    'user_id'    => $user->id,
+                    'package_id' => $package->id,
+                ]),
                 'cancel_url' => url('/api/stripe/cancel'),
             ]);
 
@@ -83,59 +133,32 @@ class ApiPackagePurchaseController extends Controller
 
 
 
+    public function success(Request $request)
+    {
+        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
 
+        try {
+            $session = \Stripe\Checkout\Session::retrieve($request->session_id);
 
-    // public function joinCampaign(Request $request)
-    // {
-    //     $user = Auth::user();
+            if ($session->payment_status === 'paid') {
+                $user    = User::findOrFail($request->user_id);
+                $package = Package::findOrFail($request->package_id);
 
-    //     // ✅ Find PackageUser entry
-    //     $packageUser = PackageUser::where('user_id', $user->id)->first();
+                // ✅ Deduct balance and add credits after payment success
+                $user->balance -= $package->price;
+                $user->total_credit += $package->credit;
+                $user->save();
 
-    //     $package = Package::where('user_id', $user->id)->first();
-    //     $campaignId = $request->input('campaign_id');
-    //     $campaign = Campaign::where('id', $campaignId)->first();
+                return redirect()->away('https://megaspinn.vercel.app/my-account')
+                    ->with('success', 'Payment successful! Your balance & credits have been updated.');
+            }
 
-    //     if ($user->total_credit < $campaign->credit) {
-    //         return ApiHelper::sendResponse(false, "Insufficient credits", '', 400);
-    //     }
+            return redirect(config('services.frontend.url') . '/payment-failed');
+        } catch (\Exception $e) {
+            return redirect(config('services.frontend.url') . '/payment-error?message=' . urlencode($e->getMessage()));
+        }
+    }
 
-
-    //     // ✅ Get the package using package_id
-    //     $package = Package::find($packageUser->package_id);
-
-    //     if (!$package) {
-    //         return ApiHelper::sendResponse(false, "Package details not found", '', 404);
-    //     }
-
-    //     // ✅ Check if user has enough credits
-    //     if ($user->total_credit < $package->credit) {
-    //         return ApiHelper::sendResponse(false, "Insufficient credits", '', 400);
-    //     }
-
-    //     // ✅ Deduct credits
-    //     $user->total_credit -= $package->credit;
-    //     $user->save();
-
-    //     if (!$campaignId) {
-    //         return ApiHelper::sendResponse(false, "Campaign ID is required", '', 422);
-    //     }
-
-    //     try {
-    //         // ✅ Save in campaign_subscribe
-    //         $subscribe = CampaignSubscribe::create([
-    //             'user_id'     => $user->id,
-    //             'campaign_id' => $campaignId,
-    //         ]);
-
-    //         return ApiHelper::sendResponse(true, "Package successfully campaign joined", [
-    //             'subscription'     => $subscribe,
-    //             'remaining_credit' => $user->total_credit,
-    //         ], 200);
-    //     } catch (\Exception $e) {
-    //         return ApiHelper::sendResponse(false, "Failed to join campaign", $e->getMessage(), 500);
-    //     }
-    // }
 
 
 
@@ -195,34 +218,34 @@ class ApiPackagePurchaseController extends Controller
 
 
 
-    public function success(Request $request)
-    {
-        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+    // public function success(Request $request)
+    // {
+    //     \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
 
-        try {
-            $session = \Stripe\Checkout\Session::retrieve($request->session_id);
+    //     try {
+    //         $session = \Stripe\Checkout\Session::retrieve($request->session_id);
 
-            if ($session->payment_status === 'paid') {
-                $user    = User::findOrFail($request->user_id);
-                $package = Package::findOrFail($request->package_id);
+    //         if ($session->payment_status === 'paid') {
+    //             $user    = User::findOrFail($request->user_id);
+    //             $package = Package::findOrFail($request->package_id);
 
-                // ✅ Add credits only after success
-                $user->total_credit += $package->credit;
-                $user->save();
+    //             // ✅ Add credits only after success
+    //             $user->total_credit += $package->credit;
+    //             $user->save();
 
-                //educt balance
-                $user->balance -= $package->price;
-                $user->save();
 
-                return redirect()->away('https://megaspinn.vercel.app/my-account')
-                    ->with('success', 'Payment successful! Your balance will be updated shortly.');
-            }
 
-            return redirect(config('services.frontend.url') . '/payment-failed');
-        } catch (\Exception $e) {
-            return redirect(config('services.frontend.url') . '/payment-error?message=' . urlencode($e->getMessage()));
-        }
-    }
+    //             return redirect()->away('https://megaspinn.vercel.app/my-account')
+    //                 ->with('success', 'Payment successful! Your balance will be updated shortly.');
+    //         }
+
+    //         return redirect(config('services.frontend.url') . '/payment-failed');
+    //     } catch (\Exception $e) {
+    //         return redirect(config('services.frontend.url') . '/payment-error?message=' . urlencode($e->getMessage()));
+    //     }
+    // }
+
+
 
     public function cancel()
     {
