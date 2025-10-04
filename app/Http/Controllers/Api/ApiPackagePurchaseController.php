@@ -32,9 +32,9 @@ class ApiPackagePurchaseController extends Controller
         $package = Package::findOrFail($validated['package_id']);
 
         // check credit
-        if ($user->total_credit < $package->credit) {
-            return ApiHelper::sendResponse(false, "Insufficient credits", '', 400);
-        }
+        // if ($user->total_credit < $package->credit) {
+        //     return ApiHelper::sendResponse(false, "Insufficient credits", '', 400);
+        // }
 
         // check balance
         if ($balance < $package->price) {
