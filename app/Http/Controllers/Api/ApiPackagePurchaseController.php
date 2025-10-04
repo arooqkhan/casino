@@ -210,7 +210,11 @@ class ApiPackagePurchaseController extends Controller
                 $user->total_credit += $package->credit;
                 $user->save();
 
-                return redirect()->away('http://localhost:5173/my-account')
+                //educt balance
+                $user->balance -= $package->price;
+                $user->save();
+
+                return redirect()->away('https://megaspinn.vercel.app/my-account')
                     ->with('success', 'Payment successful! Your balance will be updated shortly.');
             }
 

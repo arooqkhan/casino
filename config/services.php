@@ -41,7 +41,7 @@ return [
     ],
 
     'frontend' => [
-        'url' => env('FRONTEND_URL', 'http://localhost:5173'),
+        'url' => env('FRONTEND_URL', 'https://megaspinn.vercel.app/my-account'),
     ],
 
 
