@@ -22,13 +22,34 @@ class TransactionHistoryController extends Controller
     }
 
 
+    // public function approve(Request $request, $id)
+    // {
+    //     $user = auth()->user();
+    //     $user->balance -= $request->amount;
+    //     $user->save();
+
+    //     $transaction = TransactionHistory::findOrFail($id);
+    //     $transaction->update([
+    //         'payment_status' => 'approved',
+    //         'status' => 1,
+    //         'is_sent' => 1,
+    //     ]);
+
+    //     return back()->with('success', 'Withdrawal approved and marked as sent!');
+    // }
+
     public function approve(Request $request, $id)
     {
-        $user = auth()->user();
-        $user->balance -= $request->amount;
+        $transaction = TransactionHistory::findOrFail($id);
+
+        // Get the user who made the transaction
+        $user = $transaction->user; // assuming you have a relation: TransactionHistory belongsTo User
+
+        // Deduct balance
+        $user->balance -= $transaction->amount;
         $user->save();
 
-        $transaction = TransactionHistory::findOrFail($id);
+        // Update transaction status
         $transaction->update([
             'payment_status' => 'approved',
             'status' => 1,
