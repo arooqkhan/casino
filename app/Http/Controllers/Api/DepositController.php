@@ -74,12 +74,12 @@ class DepositController extends Controller
         $session = \Stripe\Checkout\Session::retrieve($sessionId);
 
         // 🔥 Log session data for debugging
-        Log::info('Stripe Deposit Success Callback', [
+        Log::info('Stripe Deposit Success Callback calling ....', [
             'session' => $session,
         ]);
         // ⚡ IMPORTANT: do NOT update balance here!
         // Webhook already does it.
-        return redirect()->away('http://localhost:5173/my-account')
+        return redirect()->away('https://megaspinn.vercel.app/my-account')
             ->with('success', 'Payment successful! Your balance will be updated shortly.');
         // return ApiHelper::sendResponse(true, "Payment successful, balance will be updated shortly", null, 200);
     }
