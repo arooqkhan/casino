@@ -64,12 +64,12 @@ class TransactionHistoryController extends Controller
     {
         $transaction = TransactionHistory::findOrFail($id);
 
-        // Get the user who made the transaction
-        $user = $transaction->user; // assuming you have a relation: TransactionHistory belongsTo User
+        // // Get the user who made the transaction
+        // $user = $transaction->user; // assuming you have a relation: TransactionHistory belongsTo User
 
-        // Deduct balance
-        $user->balance += $transaction->amount;
-        $user->save();
+        // // Deduct balance
+        // $user->balance += $transaction->amount;
+        // $user->save();
         $transaction->update([
             'payment_status' => 'rejected', // Or maybe 'rejected' if you add that
             'status' => 2,
@@ -77,7 +77,7 @@ class TransactionHistoryController extends Controller
             'updated_at' => now(), // force update
         ]);
 
-        return back()->with('error', 'Withdrawal rejected!');
+        return back()->with('success', 'Withdrawal rejected!');
     }
     /**
      * Show the form for creating a new resource.
