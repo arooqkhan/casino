@@ -14,6 +14,7 @@ use App\Models\CampaignSubscribe;
 use App\Http\Controllers\Controller;
 use App\Models\Campaign;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class ApiPackagePurchaseController extends Controller
 {
@@ -48,9 +49,15 @@ class ApiPackagePurchaseController extends Controller
                     'quantity' => 1,
                 ]],
                 'mode' => 'payment',
-                'success_url' => route('stripe.success'),
+                'success_url' => 'https://megaspinn.vercel.app/my-account', // ✅ frontend
                 'cancel_url' => url('/api/stripe/cancel'),
             ]);
+
+
+            Log::info('Stripe sessionm what is  ....', [
+                'session' => $session->url,
+            ]);
+
 
             return response()->json([
                 'success'      => true,
