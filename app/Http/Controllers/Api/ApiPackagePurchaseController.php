@@ -42,9 +42,7 @@ class ApiPackagePurchaseController extends Controller
         }
 
 
-        // $user->total_credit += $package->credit;
-        // $user->save();
-
+        $user->balance -= $package->price;
         $user->total_credit += $package->credit;
         $user->save();
 
