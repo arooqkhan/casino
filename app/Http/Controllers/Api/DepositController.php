@@ -61,58 +61,58 @@ class DepositController extends Controller
         }
     }
 
-    // public function depositSuccess(Request $request)
-    // {
-
-    //     $sessionId = $request->get('session_id');
-
-    //     if (!$sessionId) {
-    //         return ApiHelper::sendResponse(false, "Missing session_id", null, 400);
-    //     }
-
-    //     \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
-    //     $session = \Stripe\Checkout\Session::retrieve($sessionId);
-
-    //     // 🔥 Log session data for debugging
-    //     Log::info('Stripe Deposit Success Callback', [
-    //         'session' => $session,
-    //     ]);
-    //     // ⚡ IMPORTANT: do NOT update balance here!
-    //     // Webhook already does it.
-    //    return redirect()->away('http://localhost:5173/my-account')
-    // ->with('success', 'Payment successful! Your balance will be updated shortly.');
-    //     // return ApiHelper::sendResponse(true, "Payment successful, balance will be updated shortly", null, 200);
-    // }
-
-
     public function depositSuccess(Request $request)
     {
+
         $sessionId = $request->get('session_id');
 
         if (!$sessionId) {
             return ApiHelper::sendResponse(false, "Missing session_id", null, 400);
         }
 
+        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+        $session = \Stripe\Checkout\Session::retrieve($sessionId);
 
-
-        Stripe::setApiKey(config('services.stripe.secret'));
-        $session = Session::retrieve($sessionId);
-
-        try {
-            Log::info('✅ ssss Success ', [
-                'session_id' => $session->id,
-                'status'     => $session->status,
-                'payment_status' => $session->payment_status,
-            ]);
-
-            // Do NOT update balance here → your webhook already does that
-            return redirect()->away('https://megaspinn.vercel.app/my-account')
-                ->with('success', 'Payment successful! Your balance will be updated shortly.');
-        } catch (\Exception $e) {
-            Log::error("❌ Failed to retrieve Stripe session", ['error' => $e->getMessage()]);
-            return ApiHelper::sendResponse(false, "Could not verify payment", null, 500);
-        }
+        // 🔥 Log session data for debugging
+        Log::info('Stripe Deposit Success Callback', [
+            'session' => $session,
+        ]);
+        // ⚡ IMPORTANT: do NOT update balance here!
+        // Webhook already does it.
+        return redirect()->away('http://localhost:5173/my-account')
+            ->with('success', 'Payment successful! Your balance will be updated shortly.');
+        // return ApiHelper::sendResponse(true, "Payment successful, balance will be updated shortly", null, 200);
     }
+
+
+    // public function depositSuccess(Request $request)
+    // {
+    //     $sessionId = $request->get('session_id');
+
+    //     if (!$sessionId) {
+    //         return ApiHelper::sendResponse(false, "Missing session_id", null, 400);
+    //     }
+
+
+
+    //     Stripe::setApiKey(config('services.stripe.secret'));
+    //     $session = Session::retrieve($sessionId);
+
+    //     try {
+    //         Log::info('✅ ssss Success ', [
+    //             'session_id' => $session->id,
+    //             'status'     => $session->status,
+    //             'payment_status' => $session->payment_status,
+    //         ]);
+
+    //         // Do NOT update balance here → your webhook already does that
+    //         return redirect()->away('https://megaspinn.vercel.app/my-account')
+    //             ->with('success', 'Payment successful! Your balance will be updated shortly.');
+    //     } catch (\Exception $e) {
+    //         Log::error("❌ Failed to retrieve Stripe session", ['error' => $e->getMessage()]);
+    //         return ApiHelper::sendResponse(false, "Could not verify payment", null, 500);
+    //     }
+    // }
 
 
     public function depositCancel()
