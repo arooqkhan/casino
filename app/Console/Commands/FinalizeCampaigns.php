@@ -44,6 +44,11 @@ class FinalizeCampaigns extends Command
                         'updated_at' => now(),
                     ]);
 
+                $campaign->update([
+                    'status'     => 'expired',
+                    'updated_at' => now(),
+                ]);
+
                 Log::info("Winner chosen", ['campaign_id' => $campaign->id, 'winner_id' => $winner->user_id]);
             } else {
                 // no participants → mark as expired_no_winner
