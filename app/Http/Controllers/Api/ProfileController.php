@@ -35,7 +35,7 @@ class ProfileController extends Controller
         return ApiHelper::sendResponse(true, "Users retrieved successfully", $users, 200);
     }
 
-  
+
 
 
     public function profile(Request $request)
@@ -43,60 +43,60 @@ class ProfileController extends Controller
         $user = Auth::user();
 
 
-    // ✅ Profile image (fallback if empty)
-  $user->image = $user->image ? asset($user->image) : null;
+        // ✅ Profile image (fallback if empty)
+        $user->image = $user->image ? asset($user->image) : null;
 
-    // ✅ Packages
-    $packages = DB::table('package_user')
-        ->join('packages', 'package_user.package_id', '=', 'packages.id')
-        ->where('package_user.user_id', $user->id)
-        ->select('packages.*', 'package_user.created_at as subscribed_at')
-        ->get();
+        // ✅ Packages
+        $packages = DB::table('package_user')
+            ->join('packages', 'package_user.package_id', '=', 'packages.id')
+            ->where('package_user.user_id', $user->id)
+            ->select('packages.*', 'package_user.created_at as subscribed_at')
+            ->get();
 
-    // ✅ Campaigns joined
-    $campaigns = DB::table('campaign_subscribe')
-        ->join('campaigns', 'campaign_subscribe.campaign_id', '=', 'campaigns.id')
-        ->where('campaign_subscribe.user_id', $user->id)
-        ->select(
-            'campaigns.id',
-            'campaigns.name',
-            'campaigns.description',
-            'campaigns.status',
-            'campaigns.winner_price',
-            'campaigns.start_at',
-            'campaigns.end_at',
-            'campaign_subscribe.result as user_result'
-        )
-        ->get();
+        // ✅ Campaigns joined
+        $campaigns = DB::table('campaign_subscribe')
+            ->join('campaigns', 'campaign_subscribe.campaign_id', '=', 'campaigns.id')
+            ->where('campaign_subscribe.user_id', $user->id)
+            ->select(
+                'campaigns.id',
+                'campaigns.name',
+                'campaigns.description',
+                'campaigns.status',
+                'campaigns.winner_price',
+                'campaigns.start_at',
+                'campaigns.end_at',
+                'campaign_subscribe.result as user_result'
+            )
+            ->get();
 
-    // ✅ Bonuses claimed
-  $bonuses = DB::table('bonus_users')
-    ->join('bonuses', 'bonus_users.bonus_id', '=', 'bonuses.id')
-    ->where('bonus_users.user_id', $user->id)
-    ->select(
-        'bonuses.id',
-        'bonuses.type',
-        'bonuses.description',
-        'bonuses.valid_until',
-        'bonus_users.time as claimed_at'
-    )
-    ->get()
-    ->map(function ($bonus) {
-        $bonus->valid_until = $bonus->valid_until 
-            ? \Carbon\Carbon::parse($bonus->valid_until)->endOfDay()->toISOString()
-            : null;
-        return $bonus;
-    });
+        // ✅ Bonuses claimed
+        $bonuses = DB::table('bonus_users')
+            ->join('bonuses', 'bonus_users.bonus_id', '=', 'bonuses.id')
+            ->where('bonus_users.user_id', $user->id)
+            ->select(
+                'bonuses.id',
+                'bonuses.type',
+                'bonuses.description',
+                'bonuses.valid_until',
+                'bonus_users.time as claimed_at'
+            )
+            ->get()
+            ->map(function ($bonus) {
+                $bonus->valid_until = $bonus->valid_until
+                    ? \Carbon\Carbon::parse($bonus->valid_until)->endOfDay()->toISOString()
+                    : null;
+                return $bonus;
+            });
 
-    // ✅ KYC Documents
-    $kycDocs = DB::table('user_documents')
-        ->where('user_id', $user->id)
-        ->select('id', 'document_type', 'document_number', 'file_path', 'status', 'created_at')
-        ->get()
-        ->map(function ($doc) {
-            $doc->file_url = $doc->file_path ? asset($doc->file_path) : null;
-            return $doc;
-        });
+        // ✅ KYC Documents
+        $kycDocs = DB::table('user_documents')
+            ->where('user_id', $user->id)
+            ->select('id', 'document_type', 'document_number', 'file_path', 'status', 'created_at')
+            ->get()
+            ->map(function ($doc) {
+                $doc->file_url = $doc->file_path ? asset($doc->file_path) : null;
+                return $doc;
+            });
 
         if (!$user) {
             return ApiHelper::sendResponse(false, "User not authenticated", null, 401);
@@ -104,9 +104,9 @@ class ProfileController extends Controller
 
 
         // ✅ Profile image (fallback if empty)
-        $user->image = $user->image
-            ? asset($user->image)
-            : asset('uploads/default.png');
+        // $user->image = $user->image
+        //     ? asset($user->image)
+        //     : asset('uploads/default.png');
 
         // ✅ Packages
         $packages = DB::table('package_user')
