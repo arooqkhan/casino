@@ -133,9 +133,7 @@ class ProfileController extends Controller
     }
 
     // ✅ Profile image (fallback if empty)
-    $user->image = $user->image
-        ? asset($user->image)
-        : asset('uploads/default.png');
+  $user->image = $user->image ? asset($user->image) : null;
 
     // ✅ Packages
     $packages = DB::table('package_user')
