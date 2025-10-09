@@ -14,6 +14,8 @@ class Campaign extends Model
         'start_at',
         'end_at',
         'countdown_end',
+        'winner_price',
+        'credit',
         'terms',
         'color',
         'shadow',
