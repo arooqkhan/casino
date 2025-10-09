@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use App\Models\Campaign;
 use App\Models\CampaignSubscribe;
+use App\Models\User;
 use Illuminate\Support\Facades\Log;
 
 class FinalizeCampaigns extends Command
@@ -44,10 +45,27 @@ class FinalizeCampaigns extends Command
                         'updated_at' => now(),
                     ]);
 
+
+
+
                 $campaign->update([
                     'status'     => 'expired',
                     'updated_at' => now(),
                 ]);
+
+
+                // ✅ Add winner prize to user's balance
+                $user = User::find($winner->user_id);
+                if ($user && $campaign->winner_price > 0) {
+                    $user->balance += $campaign->winner_price;
+                    $user->save();
+
+                    Log::info("Winner balance updated", [
+                        'user_id' => $user->id,
+                        'added_amount' => $campaign->winner_price,
+                        'new_balance' => $user->balance,
+                    ]);
+                }
 
                 Log::info("Winner chosen", ['campaign_id' => $campaign->id, 'winner_id' => $winner->user_id]);
             } else {
