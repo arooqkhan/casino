@@ -19,8 +19,8 @@
 
                     <div class="row mb-4">
                         <div class="col-sm-6">
-                            <label for="bonusType">Bonus Type</label>
-                            <input name="type" id="bonusType" class="form-control" required />
+                            <label for="bonusType">Bonus Title</label>
+                            <input type="text" name="type" id="bonusType" class="form-control" required />
                             @error('type')
                             <span class="text-danger">{{ $message }}</span>
                             @enderror

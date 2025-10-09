@@ -25,7 +25,7 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 <div class="col-lg-12">
-<h4 class="m-2 mt-4">Bonuses</h4>
+    <h4 class="m-2 mt-4">Bonuses</h4>
 
     <div class="statbox widget box box-shadow">
         @if(session('success'))
@@ -34,7 +34,8 @@
                 Swal.fire({
                     position: 'bottom-end',
                     icon: 'success',
-                    title: '{{ session('success') }}',
+                    title: '{{ session('
+                    success ') }}',
                     showConfirmButton: false,
                     timer: 3000,
                     toast: true,
@@ -52,7 +53,8 @@
                 Swal.fire({
                     position: 'bottom-end',
                     icon: 'error',
-                    title: '{{ session('error') }}',
+                    title: '{{ session('
+                    error ') }}',
                     showConfirmButton: false,
                     timer: 3000,
                     toast: true,
@@ -67,28 +69,29 @@
 
 
 
-    <div class="statbox widget box box-shadow">
-        <div class="widget-content widget-content-area">
+        <div class="statbox widget box box-shadow">
+            <div class="widget-content widget-content-area">
 
-            <a href="{{ route('bonus.create') }}" class="btn btn-success m-2">Add Bonus</a>
+                <a href="{{ route('bonus.create') }}" class="btn btn-success m-2">Add Bonus</a>
 
-            <table id="style-2" class="table style-2 dt-table-hover">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Type</th>
-                        <th>Campaign</th>
-                        <th>Valid From</th>
-                        <th>Valid Until</th>
-                        <th class="text-center">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($bonuses as $bonus)
+                <table id="style-2" class="table style-2 dt-table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Type</th>
+                            <th>Credit</th>
+                            <th>Valid From</th>
+                            <th>Valid Until</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($bonuses as $bonus)
                         <tr>
                             <td>{{ $bonus->id }}</td>
-                            <td>{{ ucfirst(str_replace('_', ' ', $bonus->type)) }}</td>
-                            <td>{{ $bonus->campaign ? $bonus->campaign->name : '-' }}</td>
+                            <td>{{ $bonus->type }}</td>
+                            <td>{{ $bonus->credit }}</td>
+                            <!-- <td>{{ $bonus->campaign ? $bonus->campaign->name : '-' }}</td> -->
                             <td>{{ $bonus->valid_from ?? '-' }}</td>
                             <td>{{ $bonus->valid_until ?? '-' }}</td>
                             <td class="text-center">
@@ -96,7 +99,7 @@
                                     <i class="fas fa-edit"></i>
                                 </a>
 
-                                <form action="{{ route('bonus.destroy', $bonus->id) }}" 
+                                <form action="{{ route('bonus.destroy', $bonus->id) }}"
                                     method="POST" style="display:inline;" class="delete-form">
                                     @csrf
                                     @method('DELETE')
@@ -106,38 +109,38 @@
                                 </form>
                             </td>
                         </tr>
-                    @empty
+                        @empty
                         <tr>
                             <td colspan="6" class="text-center">No bonus records found.</td>
                         </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-</div>
 
-<script>
-    $(document).ready(function() {
-        $('.delete-form').on('submit', function(e) {
-            e.preventDefault();
+    <script>
+        $(document).ready(function() {
+            $('.delete-form').on('submit', function(e) {
+                e.preventDefault();
 
-            const form = this;
+                const form = this;
 
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "This bonus will be deleted permanently!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    form.submit();
-                }
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "This bonus will be deleted permanently!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
             });
         });
-    });
-</script>
-@endsection
+    </script>
+    @endsection
