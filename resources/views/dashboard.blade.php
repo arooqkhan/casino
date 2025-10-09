@@ -359,7 +359,7 @@
 
         <!-- Third Row: Additional Content -->
         <div class="third-row">
-            <div class="activity-card">
+            <!-- <div class="activity-card">
                 <div class="card-heading">Recent Activity</div>
                 <div class="activity-list">
                     <div class="activity-item">
@@ -391,9 +391,9 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> -->
 
-            <div class="progress-card">
+            <!-- <div class="progress-card">
                 <div class="card-heading">Payment Goals</div>
                 <div class="progress-list">
                     <div class="progress-item">
@@ -433,7 +433,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> -->
         </div>
     </div>
 
