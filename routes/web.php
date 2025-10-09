@@ -131,6 +131,15 @@ Route::get('/migrate', function () {
     }
 });
 
+
+Route::get('/migrate-fresh', function () {
+
+    // Drop all tables and re-run all migrations
+    Artisan::call('migrate:fresh', [
+        '--force' => true,
+    ]);
+});
+
 Route::get('/seed', function () {
     try {
         Artisan::call('db:seed', [
