@@ -17,12 +17,11 @@ class StripeWebhookController extends Controller
         $payload = $request->getContent();
         $sigHeader = $request->header('Stripe-Signature');
         $secret = config('services.stripe.webhook_secret');
-        // $secret = "we_1S9OEiKrxuMCwUpjeoDKWmti";
 
-        // Log incoming request
         Log::info("Stripe Webhook received", [
             'signature' => $sigHeader,
             'payload'   => $payload,
+            'secreteee'   => $secret,
         ]);
 
         // Debug secret (only while testing!)

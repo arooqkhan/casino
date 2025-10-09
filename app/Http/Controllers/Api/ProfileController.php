@@ -124,13 +124,10 @@ class ProfileController extends Controller
     // }
 
 
-  public function profile(Request $request)
-{
-    $user = Auth::user();
+    public function profile(Request $request)
+    {
+        $user = Auth::user();
 
-    if (!$user) {
-        return ApiHelper::sendResponse(false, "User not authenticated", null, 401);
-    }
 
     // ✅ Profile image (fallback if empty)
   $user->image = $user->image ? asset($user->image) : null;
@@ -187,29 +184,91 @@ class ProfileController extends Controller
             return $doc;
         });
 
-    // ✅ Bank/Card details
-    $bankDetails = Card::where('user_id', $user->id)->first();
+        if (!$user) {
+            return ApiHelper::sendResponse(false, "User not authenticated", null, 401);
+        }
 
-    // ✅ Payment history
-    $paymentHistory = DB::table('transaction_histories')
-        ->where('user_id', $user->id)
-     
-        ->orderBy('created_at', 'desc')
-        ->get();
 
-    // ✅ Response payload
-    $data = [
-        'user'            => $user,
-        'packages'        => $packages,
-        'campaigns'       => $campaigns,
-        'bonuses'         => $bonuses,
-        'kyc_docs'        => $kycDocs,
-        'bank_details'    => $bankDetails,
-        'payment_history' => $paymentHistory, // 🆕 added
-    ];
+        // ✅ Profile image (fallback if empty)
+        $user->image = $user->image
+            ? asset($user->image)
+            : asset('uploads/default.png');
 
-    return ApiHelper::sendResponse(true, "User retrieved successfully", $data, 200);
-}
+        // ✅ Packages
+        $packages = DB::table('package_user')
+            ->join('packages', 'package_user.package_id', '=', 'packages.id')
+            ->where('package_user.user_id', $user->id)
+            ->select('packages.*', 'package_user.created_at as subscribed_at')
+            ->get();
+
+        // ✅ Campaigns joined
+        $campaigns = DB::table('campaign_subscribe')
+            ->join('campaigns', 'campaign_subscribe.campaign_id', '=', 'campaigns.id')
+            ->where('campaign_subscribe.user_id', $user->id)
+            ->select(
+                'campaigns.id',
+                'campaigns.name',
+                'campaigns.description',
+                'campaigns.status',
+                'campaigns.winner_price',
+                'campaigns.start_at',
+                'campaigns.end_at',
+                'campaign_subscribe.result as user_result'
+            )
+            ->get();
+
+        // ✅ Bonuses claimed
+        $bonuses = DB::table('bonus_users')
+            ->join('bonuses', 'bonus_users.bonus_id', '=', 'bonuses.id')
+            ->where('bonus_users.user_id', $user->id)
+            ->select(
+                'bonuses.id',
+                'bonuses.type',
+                'bonuses.description',
+                'bonuses.valid_until',
+                'bonus_users.time as claimed_at'
+            )
+            ->get()
+            ->map(function ($bonus) {
+                $bonus->valid_until = $bonus->valid_until
+                    ? \Carbon\Carbon::parse($bonus->valid_until)->endOfDay()->toISOString()
+                    : null;
+                return $bonus;
+            });
+
+        // ✅ KYC Documents
+        $kycDocs = DB::table('user_documents')
+            ->where('user_id', $user->id)
+            ->select('id', 'document_type', 'document_number', 'file_path', 'status', 'created_at')
+            ->get()
+            ->map(function ($doc) {
+                $doc->file_url = $doc->file_path ? asset($doc->file_path) : null;
+                return $doc;
+            });
+
+        // ✅ Bank/Card details
+        $bankDetails = Card::where('user_id', $user->id)->first();
+
+        // ✅ Payment history
+        $paymentHistory = DB::table('transaction_histories')
+            ->where('user_id', $user->id)
+
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // ✅ Response payload
+        $data = [
+            'user'            => $user,
+            'packages'        => $packages,
+            'campaigns'       => $campaigns,
+            'bonuses'         => $bonuses,
+            'kyc_docs'        => $kycDocs,
+            'bank_details'    => $bankDetails,
+            'payment_history' => $paymentHistory, // 🆕 added
+        ];
+
+        return ApiHelper::sendResponse(true, "User retrieved successfully", $data, 200);
+    }
 
 
 
@@ -399,88 +458,87 @@ class ProfileController extends Controller
 
     // Update profile api
 
-public function updateProfile(Request $request)
-{
-    $user = Auth::user();
+    public function updateProfile(Request $request)
+    {
+        $user = Auth::user();
 
-    if (!$user) {
-        return ApiHelper::sendResponse(false, "User not authenticated", null, 401);
+        if (!$user) {
+            return ApiHelper::sendResponse(false, "User not authenticated", null, 401);
+        }
+
+        try {
+            // Validation (aapke screenshot wale fields ke liye)
+            $request->validate([
+                'first_name'         => 'nullable|string|max:255',
+                'last_name'          => 'nullable|string|max:255',
+                'dob'                => 'nullable|date',
+                'address'            => 'nullable|string|max:255',
+                'email'              => 'nullable|email|unique:users,email,' . $user->id,
+                'image'              => 'nullable|image|max:2048',
+                'province'           => 'nullable|string|max:255',
+                'postal_code'        => 'nullable|string|max:255',
+                'city'               => 'nullable|string|max:255',
+                'country'            => 'nullable|string|max:255',
+            ]);
+
+            // Saare input ek saath le lo
+            $data = $request->all();
+
+            // Password hash karna hoga
+            if ($request->filled('password')) {
+                $data['password'] = bcrypt($request->password);
+            }
+
+            // Profile image handle
+            if ($request->hasFile('image')) {
+                if ($user->image && File::exists(public_path($user->image))) {
+                    File::delete(public_path($user->image));
+                }
+
+                $image = $request->file('image');
+                $imageName = 'profile_' . time() . '.' . $image->getClientOriginalExtension();
+                $uploadPath = public_path('uploads/profile');
+
+                if (!File::exists($uploadPath)) {
+                    File::makeDirectory($uploadPath, 0777, true, true);
+                }
+
+                $image->move($uploadPath, $imageName);
+                $data['image'] = 'uploads/profile/' . $imageName;
+            }
+
+            // Avatar image handle
+            if ($request->hasFile('avatar')) {
+                if ($user->avatar && File::exists(public_path($user->avatar))) {
+                    File::delete(public_path($user->avatar));
+                }
+
+                $avatar = $request->file('avatar');
+                $avatarName = 'avatar_' . time() . '.' . $avatar->getClientOriginalExtension();
+                $uploadPath = public_path('uploads/avatar');
+
+                if (!File::exists($uploadPath)) {
+                    File::makeDirectory($uploadPath, 0777, true, true);
+                }
+
+                $avatar->move($uploadPath, $avatarName);
+                $data['avatar'] = 'uploads/avatar/' . $avatarName;
+            }
+
+            // User update with all request data
+            $user->update($data);
+
+            // Full URLs for response
+            if ($user->image) {
+                $user->image = asset($user->image);
+            }
+            if ($user->avatar) {
+                $user->avatar = asset($user->avatar);
+            }
+
+            return ApiHelper::sendResponse(true, "Profile updated successfully", $user, 200);
+        } catch (\Exception $e) {
+            return ApiHelper::sendResponse(false, "Something went wrong", $e->getMessage(), 500);
+        }
     }
-
-    try {
-        // Validation (aapke screenshot wale fields ke liye)
-        $request->validate([
-            'first_name'         => 'nullable|string|max:255',
-            'last_name'          => 'nullable|string|max:255',
-            'dob'                => 'nullable|date',
-            'address'            => 'nullable|string|max:255',
-            'email'              => 'nullable|email|unique:users,email,' . $user->id,
-            'image'              => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'province'           => 'nullable|string|max:255',
-            'postal_code'        => 'nullable|string|max:255',
-            'city'               => 'nullable|string|max:255',
-            'country'            => 'nullable|string|max:255',
-        ]);
-
-        // Saare input ek saath le lo
-        $data = $request->all();
-
-        // Password hash karna hoga
-        if ($request->filled('password')) {
-            $data['password'] = bcrypt($request->password);
-        }
-
-        // Profile image handle
-        if ($request->hasFile('image')) {
-            if ($user->image && File::exists(public_path($user->image))) {
-                File::delete(public_path($user->image));
-            }
-
-            $image = $request->file('image');
-            $imageName = 'profile_' . time() . '.' . $image->getClientOriginalExtension();
-            $uploadPath = public_path('uploads/profile');
-
-            if (!File::exists($uploadPath)) {
-                File::makeDirectory($uploadPath, 0777, true, true);
-            }
-
-            $image->move($uploadPath, $imageName);
-            $data['image'] = 'uploads/profile/' . $imageName;
-        }
-
-        // Avatar image handle
-        if ($request->hasFile('avatar')) {
-            if ($user->avatar && File::exists(public_path($user->avatar))) {
-                File::delete(public_path($user->avatar));
-            }
-
-            $avatar = $request->file('avatar');
-            $avatarName = 'avatar_' . time() . '.' . $avatar->getClientOriginalExtension();
-            $uploadPath = public_path('uploads/avatar');
-
-            if (!File::exists($uploadPath)) {
-                File::makeDirectory($uploadPath, 0777, true, true);
-            }
-
-            $avatar->move($uploadPath, $avatarName);
-            $data['avatar'] = 'uploads/avatar/' . $avatarName;
-        }
-
-        // User update with all request data
-        $user->update($data);
-
-        // Full URLs for response
-        if ($user->image) {
-            $user->image = asset($user->image);
-        }
-        if ($user->avatar) {
-            $user->avatar = asset($user->avatar);
-        }
-
-        return ApiHelper::sendResponse(true, "Profile updated successfully", $user, 200);
-    } catch (\Exception $e) {
-        return ApiHelper::sendResponse(false, "Something went wrong", $e->getMessage(), 500);
-    }
-}
-
 }

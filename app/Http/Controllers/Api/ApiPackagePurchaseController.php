@@ -12,25 +12,27 @@ use Illuminate\Http\Request;
 use Stripe\Checkout\Session;
 use App\Models\CampaignSubscribe;
 use App\Http\Controllers\Controller;
+use App\Models\Campaign;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class ApiPackagePurchaseController extends Controller
 {
     public function createCheckout(Request $request)
     {
-       
         $validated = $request->validate([
             'package_id' => 'required|exists:packages,id',
 
         ]);
-
         $user = Auth::user();
-
+        $balance = $user->balance;
         $package = Package::findOrFail($validated['package_id']);
-
-         $user->total_credit += $package->credit;
-         $user->save();
-
+        if ($balance < $package->price) {
+            return ApiHelper::sendResponse(false, "Insufficient balance", '', 400);
+        }
+        $user->balance -= $package->price;
+        $user->total_credit += $package->credit;
+        $user->save();
         try {
             Stripe::setApiKey(config('services.stripe.secret'));
 
@@ -47,9 +49,15 @@ class ApiPackagePurchaseController extends Controller
                     'quantity' => 1,
                 ]],
                 'mode' => 'payment',
-                'success_url' => route('stripe.success'),
+                'success_url' => 'https://megaspinn.vercel.app/my-account', // ✅ frontend
                 'cancel_url' => url('/api/stripe/cancel'),
             ]);
+
+
+            Log::info('Stripe sessionm what is  ....', [
+                'session' => $session->url,
+            ]);
+
 
             return response()->json([
                 'success'      => true,
@@ -65,105 +73,91 @@ class ApiPackagePurchaseController extends Controller
 
 
 
+    public function success(Request $request)
+    {
+        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
 
+        try {
+            $session = \Stripe\Checkout\Session::retrieve($request->session_id);
 
-public function joinCampaign(Request $request)
-{
-    $user = Auth::user();
+            if ($session->payment_status === 'paid') {
+                $user    = User::findOrFail($request->user_id);
+                $package = Package::findOrFail($request->package_id);
 
-    // ✅ Find PackageUser entry
-    $packageUser = PackageUser::where('user_id', $user->id)->first();
+                // ✅ Add credits only after success
+                $user->total_credit += $package->credit;
+                $user->save();
 
-    if (!$packageUser) {
-        return ApiHelper::sendResponse(false, "Package Not Found", '', 404);
+                return redirect()->away('https://megaspinn.vercel.app/my-account')
+                    ->with('success', 'Payment successful! Your balance will be updated shortly.');
+            }
+
+            return redirect(config('services.frontend.url') . '/payment-failed');
+        } catch (\Exception $e) {
+            return redirect(config('services.frontend.url') . '/payment-error?message=' . urlencode($e->getMessage()));
+        }
     }
 
-    // ✅ Get the package using package_id
-    $package = Package::find($packageUser->package_id);
-
-    if (!$package) {
-        return ApiHelper::sendResponse(false, "Package details not found", '', 404);
+    public function cancel()
+    {
+        return redirect(config('services.frontend.url') . '/dashboard?status=cancel');
     }
 
-    // ✅ Check if user has enough credits
-    if ($user->total_credit < $package->credit) {
-        return ApiHelper::sendResponse(false, "Insufficient credits", '', 400);
+
+
+
+
+
+
+
+    public function joinCampaign(Request $request)
+    {
+        $user = Auth::user();
+        $campaignId = $request->input('campaign_id');
+
+        if (!$campaignId) {
+            return ApiHelper::sendResponse(false, "Campaign ID is required", '', 422);
+        }
+
+        $campaign = Campaign::find($campaignId);
+
+        if (!$campaign) {
+            return ApiHelper::sendResponse(false, "Campaign not found", '', 404);
+        }
+
+        // ✅ Check if user has enough credits for campaign
+        if ($user->total_credit < $campaign->credit) {
+            return ApiHelper::sendResponse(false, "Insufficient credits", '', 400);
+        }
+
+        try {
+            // ✅ Deduct credits
+            $user->total_credit -= $campaign->credit;
+            $user->save();
+
+            // ✅ Save in campaign_subscribe
+            $subscribe = CampaignSubscribe::create([
+                'user_id'     => $user->id,
+                'campaign_id' => $campaignId,
+            ]);
+
+            return ApiHelper::sendResponse(true, "Successfully joined campaign", [
+                'subscription'     => $subscribe,
+                'remaining_credit' => $user->total_credit,
+            ], 200);
+        } catch (\Exception $e) {
+            return ApiHelper::sendResponse(false, "Failed to join campaign", $e->getMessage(), 500);
+        }
     }
 
-    // ✅ Deduct credits
-    $user->total_credit -= $package->credit;
-    $user->save();
 
-    // ✅ campaign_id from request body
-    $campaignId = $request->input('campaign_id'); 
-
-    if (!$campaignId) {
-        return ApiHelper::sendResponse(false, "Campaign ID is required", '', 422);
-    }
-
-    try {
-        // ✅ Save in campaign_subscribe
-        $subscribe = CampaignSubscribe::create([
-            'user_id'     => $user->id,
-            'campaign_id' => $campaignId,
-        ]);
-
-        return ApiHelper::sendResponse(true, "Package successfully campaign joined", [
-            'subscription'     => $subscribe,
-            'remaining_credit' => $user->total_credit,
-        ], 200);
-
-    } catch (\Exception $e) {
-        return ApiHelper::sendResponse(false, "Failed to join campaign", $e->getMessage(), 500);
-    }
-}
-
-
- public function getAllCompaign()
+    public function getAllCompaign()
     {
         // Get all users with their subscribed campaigns
         $users = User::with(['campaigns' => function ($query) {
             $query->select('campaigns.id', 'campaigns.name', 'campaigns.status');
-        }])->get(['id', 'first_name','last_name', 'email']);
+        }])->get(['id', 'first_name', 'last_name', 'email']);
 
-       return ApiHelper::sendResponse(true, "Campaign list", $users);
+        return ApiHelper::sendResponse(true, "Campaign list", $users);
     }
-    
-
-
-
-
-
-public function success(Request $request)
-{
-    \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
-
-    try {
-        $session = \Stripe\Checkout\Session::retrieve($request->session_id);
-
-        if ($session->payment_status === 'paid') {
-            $user    = User::findOrFail($request->user_id);
-            $package = Package::findOrFail($request->package_id);
-
-            // ✅ Add credits only after success
-            $user->total_credit += $package->credit;
-            $user->save();
-
-            return redirect()->away('http://localhost:5173/my-account')
-    ->with('success', 'Payment successful! Your balance will be updated shortly.');
-        }
-
-        return redirect(config('services.frontend.url') . '/payment-failed');
-    } catch (\Exception $e) {
-        return redirect(config('services.frontend.url') . '/payment-error?message=' . urlencode($e->getMessage()));
-    }
-}
-
-public function cancel()
-{
-    return redirect(config('services.frontend.url') . '/dashboard?status=cancel');
-}
-
-
-
 }

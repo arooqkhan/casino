@@ -22,33 +22,62 @@ class TransactionHistoryController extends Controller
     }
 
 
-    public function approve($id)
-    {
+    // public function approve(Request $request, $id)
+    // {
+    //     $user = auth()->user();
+    //     $user->balance -= $request->amount;
+    //     $user->save();
 
-     
+    //     $transaction = TransactionHistory::findOrFail($id);
+    //     $transaction->update([
+    //         'payment_status' => 'approved',
+    //         'status' => 1,
+    //         'is_sent' => 1,
+    //     ]);
+
+    //     return back()->with('success', 'Withdrawal approved and marked as sent!');
+    // }
+
+    public function approve(Request $request, $id)
+    {
         $transaction = TransactionHistory::findOrFail($id);
+
+        // Get the user who made the transaction
+        $user = $transaction->user; // assuming you have a relation: TransactionHistory belongsTo User
+
+        // Deduct balance
+        $user->balance -= $transaction->amount;
+        $user->save();
+
+        // Update transaction status
         $transaction->update([
             'payment_status' => 'approved',
             'status' => 1,
             'is_sent' => 1,
+            'updated_at' => now(), // force update
         ]);
 
         return back()->with('success', 'Withdrawal approved and marked as sent!');
     }
 
-    public function reject(Request $request , $id)
+    public function reject(Request $request, $id)
     {
-        $user = auth()->user();
-          $user->balance += $request->amount;
-            $user->save();
         $transaction = TransactionHistory::findOrFail($id);
+
+        // // Get the user who made the transaction
+        // $user = $transaction->user; // assuming you have a relation: TransactionHistory belongsTo User
+
+        // // Deduct balance
+        // $user->balance += $transaction->amount;
+        // $user->save();
         $transaction->update([
-            'payment_status' => 'pending', // Or maybe 'rejected' if you add that
+            'payment_status' => 'rejected', // Or maybe 'rejected' if you add that
             'status' => 2,
             'is_sent' => 2,
+            'updated_at' => now(), // force update
         ]);
 
-        return back()->with('error', 'Withdrawal rejected!');
+        return back()->with('success', 'Withdrawal rejected!');
     }
     /**
      * Show the form for creating a new resource.
