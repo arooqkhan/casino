@@ -13,24 +13,23 @@ use Illuminate\Support\Facades\Auth;
 
 class ApiBonusController extends Controller
 {
-   public function index(Request $request)
-{
-    
-    try {
-        // agar tumhe pagination chahiye to:
-        // $bonuses = Bonus::paginate(10);
-        $bonuses = Bonus::all();
+    public function index(Request $request)
+    {
 
-        return ApiHelper::sendResponse(true, "Bonus list retrieved successfully", $bonuses, 200);
+        try {
+            // agar tumhe pagination chahiye to:
+            // $bonuses = Bonus::paginate(10);
+            $bonuses = Bonus::all();
 
-    } catch (\Exception $e) {
-        return ApiHelper::sendResponse(false, "Something went wrong", $e->getMessage(), 500);
+            return ApiHelper::sendResponse(true, "Bonus list retrieved successfully", $bonuses, 200);
+        } catch (\Exception $e) {
+            return ApiHelper::sendResponse(false, "Something went wrong", $e->getMessage(), 500);
+        }
     }
-}
 
 
 
-  public function purchase(Request $request)
+    public function purchase(Request $request)
     {
         $request->validate([
             'bonus_id' => 'required|exists:bonuses,id',
@@ -71,73 +70,75 @@ class ApiBonusController extends Controller
 
 
 
-public function claimBonus(Request $request)
-{
+    public function claimBonus(Request $request)
+    {
 
-    try {
-        $validated = $request->validate([
-            'bonus_id' => 'required|exists:bonuses,id',
-        ]);
+        try {
+            $validated = $request->validate([
+                'bonus_id' => 'required|exists:bonuses,id',
+            ]);
 
-        $user = Auth::user();
+            $user = Auth::user();
 
-        if (!$user) {
-            return ApiHelper::sendResponse(false, "User not authenticated", null, 401);
+            if (!$user) {
+                return ApiHelper::sendResponse(false, "User not authenticated", null, 401);
+            }
+
+            // Check agar already claim kar chuka hai
+            $alreadyClaimed = DB::table('bonus_users')
+                ->where('user_id', $user->id)
+                ->where('bonus_id', $validated['bonus_id'])
+                ->first();
+
+            if ($alreadyClaimed) {
+                return ApiHelper::sendResponse(false, "Bonus already claimed.", null, 409);
+            }
+
+            // Get the bonus details
+            $bonus = DB::table('bonuses')->where('id', $validated['bonus_id'])->first();
+
+            if (!$bonus) {
+                return ApiHelper::sendResponse(false, "Bonus not found.", null, 404);
+            }
+
+            // Add bonus credit to user total credit
+            $user->total_credit += $bonus->credit;
+            $user->save();
+
+            // Insert bonus claim record
+            $bonusClaim = DB::table('bonus_users')->insertGetId([
+                'bonus_id' => $validated['bonus_id'],
+                'user_id'  => $user->id,
+                'time'     => now(),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            return ApiHelper::sendResponse(
+                true,
+                "Bonus claimed successfully!",
+                [
+                    'bonus_user_id' => $bonusClaim,
+                    'bonus_id'      => $validated['bonus_id'],
+                    'user_id'       => $user->id,
+                    'claimed_at'    => now(),
+                ],
+
+            );
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return ApiHelper::sendResponse(
+                false,
+                "Validation failed.",
+                $e->errors(),
+
+            );
+        } catch (\Exception $e) {
+            return ApiHelper::sendResponse(
+                false,
+                "Something went wrong.",
+                $e->getMessage(),
+
+            );
         }
-
-        // Check agar already claim kar chuka hai
-        $alreadyClaimed = DB::table('bonus_users')
-            ->where('user_id', $user->id)
-            ->where('bonus_id', $validated['bonus_id'])
-            ->first();
-
-        if ($alreadyClaimed) {
-            return ApiHelper::sendResponse(false, "Bonus already claimed.", null, 409);
-        }
-
-        // Insert bonus claim record
-        $bonusClaim = DB::table('bonus_users')->insertGetId([
-            'bonus_id' => $validated['bonus_id'],
-            'user_id'  => $user->id,
-            'time'     => now(),
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        return ApiHelper::sendResponse(
-            true,
-            "Bonus claimed successfully!",
-            [
-                'bonus_user_id' => $bonusClaim,
-                'bonus_id'      => $validated['bonus_id'],
-                'user_id'       => $user->id,
-                'claimed_at'    => now(),
-            ],
-   
-        );
-
-    } catch (\Illuminate\Validation\ValidationException $e) {
-        return ApiHelper::sendResponse(
-            false,
-            "Validation failed.",
-            $e->errors(),
-       
-        );
-
-    } catch (\Exception $e) {
-        return ApiHelper::sendResponse(
-            false,
-            "Something went wrong.",
-            $e->getMessage(),
-      
-        );
     }
-}
-
-
-
-
-
-    
-
 }

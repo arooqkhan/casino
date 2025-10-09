@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('bonuses', function (Blueprint $table) {
             $table->id();
-            $table->string('type')->default('deposit_bonus'); // deposit bonus, free spins
+            $table->string('type'); // deposit bonus, free spins
             $table->foreignId('campaign_id')
                 ->nullable()
                 ->constrained('campaigns')

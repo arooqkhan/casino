@@ -6,8 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Bonus extends Model
 {
-       protected $fillable = [
+    protected $fillable = [
         'type',
+        'credit',
         'campaign_id',
         'valid_from',
         'valid_until',
@@ -16,24 +17,23 @@ class Bonus extends Model
         'description',
     ];
 
-       protected $casts = [
+    protected $casts = [
         'valid_from'  => 'datetime',
         'valid_until' => 'datetime',
         'created_at'  => 'datetime',
         'updated_at'  => 'datetime',
     ];
-    
+
 
     public function campaign()
     {
         return $this->belongsTo(Campaign::class);
     }
 
-     public function users()
+    public function users()
     {
         return $this->belongsToMany(User::class, 'bonus_users', 'bonus_id', 'user_id')
-                    ->withPivot('time')
-                    ->withTimestamps();
+            ->withPivot('time')
+            ->withTimestamps();
     }
-    
 }

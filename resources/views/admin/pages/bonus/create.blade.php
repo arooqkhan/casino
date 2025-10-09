@@ -20,16 +20,20 @@
                     <div class="row mb-4">
                         <div class="col-sm-6">
                             <label for="bonusType">Bonus Type</label>
-                            <select name="type" id="bonusType" class="form-control" required>
-                                <option value="deposit_bonus" {{ old('type')=='deposit_bonus' ? 'selected' : '' }}>Deposit Bonus</option>
-                                <option value="free_spins" {{ old('type')=='free_spins' ? 'selected' : '' }}>Free Spins</option>
-                            </select>
+                            <input name="type" id="bonusType" class="form-control" required />
                             @error('type')
                             <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
-
                         <div class="col-sm-6">
+                            <label for="bonusType">Credit</label>
+                            <input type="number" name="credit" id="credit" class="form-control" required />
+                            @error('credit')
+                            <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <!-- <div class="col-sm-6">
                             <label for="campaign">Select Campaign</label>
                             <select name="campaign_id" id="campaign" class="form-control">
                                 <option value="">-- None --</option>
@@ -42,7 +46,7 @@
                             @error('campaign_id')
                             <span class="text-danger">{{ $message }}</span>
                             @enderror
-                        </div>
+                        </div> -->
                     </div>
 
                     <div class="row mb-4">
@@ -91,16 +95,16 @@
                         </div>
                     </div>
 
-                      <div class="row mb-4">
-        <div class="col-12">
-            <label for="description">Description</label>
-            <textarea name="description" id="description" rows="4" class="form-control"
-                placeholder="Enter bonus description...">{{ old('description') }}</textarea>
-            @error('description')
-            <span class="text-danger">{{ $message }}</span>
-            @enderror
-        </div>
-    </div>
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <label for="description">Description</label>
+                            <textarea name="description" id="description" rows="4" class="form-control"
+                                placeholder="Enter bonus description...">{{ old('description') }}</textarea>
+                            @error('description')
+                            <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
 
                     <button type="submit" class="btn btn-primary">Save Bonus</button>
                 </form>
