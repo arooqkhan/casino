@@ -5,10 +5,11 @@ namespace App\Http\Controllers\Api;
 use App\Models\User;
 use App\Models\Campaign;
 use App\Helpers\ApiHelper;
+use App\Helpers\MailHelper;
 use Illuminate\Http\Request;
 use App\Models\TransactionHistory;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
 
 class ApiWinningCompaignController extends Controller
 {
@@ -59,6 +60,7 @@ class ApiWinningCompaignController extends Controller
 
     public function declareWinner(Request $request)
     {
+        
         $request->validate([
             'campaign_id' => 'required|exists:campaigns,id',
             'user_id' => 'nullable|exists:users,id', // nullable for draw
@@ -123,7 +125,17 @@ class ApiWinningCompaignController extends Controller
             $user->balance += $winningPrice;
             $user->save();
 
-            // 6. Expire the campaign
+
+            // 6 Send Winner Email
+            $subject = "🎉 Congratulations! You Won the Campaign Prize";
+            $message = "Dear {$user->name},\n\n" .
+                "Congratulations! You have been selected as the winner for the campaign '{$campaign->title}'.\n" .
+                "You have received a prize of {$winningPrice} credits which has been added to your account.\n\n" .
+                "Best regards,\nThe Campaign Team";
+
+            MailHelper::sendMail($user->email, $subject, $message);
+
+            // 7. Expire the campaign
             $campaign->status = 'expired';
             $campaign->end_at = now();
             $campaign->save();

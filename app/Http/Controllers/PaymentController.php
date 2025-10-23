@@ -15,6 +15,7 @@ class PaymentController extends Controller
 {
     public function checkout(Request $request)
     {
+       
         $user = Auth::user();
 
         $request->validate([
