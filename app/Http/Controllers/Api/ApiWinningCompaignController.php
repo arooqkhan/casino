@@ -128,7 +128,7 @@ class ApiWinningCompaignController extends Controller
 
             // 6 Send Winner Email
             $subject = "🎉 Congratulations! You Won the Campaign Prize";
-            $message = "Dear {$user->name},\n\n" .
+            $message =  "Dear {$user->first_name} {$user->last_name},\n\n" .
                 "Congratulations! You have been selected as the winner for the campaign '{$campaign->title}'.\n" .
                 "You have received a prize of {$winningPrice} credits which has been added to your account.\n\n" .
                 "Best regards,\nThe Campaign Team";
