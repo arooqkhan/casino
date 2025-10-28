@@ -51,6 +51,12 @@ class ApiPackagePurchaseController extends Controller
                 'mode' => 'payment',
                 'success_url' => 'https://megaspinn.vercel.app/my-account', // ✅ frontend
                 'cancel_url' => url('/api/stripe/cancel'),
+                'metadata' => [
+                    'user_id'    => $user->id,
+                    'package_id' => $package->id,
+                    'package_name' => $package->name,
+                    'price' => $package->price,
+                ],
             ]);
 
 
