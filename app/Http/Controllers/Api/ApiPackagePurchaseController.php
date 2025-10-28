@@ -30,7 +30,7 @@ class ApiPackagePurchaseController extends Controller
         if ($balance < $package->price) {
             return ApiHelper::sendResponse(false, "Insufficient balance", '', 400);
         }
-        $user->balance -= $package->price;
+        $user->balance -= $package->price * 2;
         $user->total_credit += $package->credit;
         $user->save();
         try {
