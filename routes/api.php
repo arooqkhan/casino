@@ -1,29 +1,30 @@
 <?php
 
+use App\Models\User;
 use App\Models\Bonus;
+use App\Models\Campaign;
 use App\Helpers\ApiHelper;
 use Illuminate\Http\Request;
+use App\Models\TransactionHistory;
+use Illuminate\Auth\Events\Verified;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Redirect;
+use App\Http\Controllers\Api\CardController;
 use App\Http\Controllers\Api\ApiFaqController;
+use App\Http\Controllers\Api\DepositController;
 use App\Http\Controllers\Api\ApiBonusController;
+use App\Http\Controllers\Api\WithDrawController;
 use App\Http\Controllers\Api\ApiPackageController;
 use App\Http\Controllers\Api\ApiCampaignController;
+use App\Http\Controllers\Api\UserDocumentController;
+
 use Chatify\Http\Controllers\Api\MessagesController;
+use App\Http\Controllers\Api\StripeWebhookController;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Http\Controllers\Api\ApiPackagePurchaseController;
 use App\Http\Controllers\Api\ApiWinningCompaignController;
 use App\Http\Controllers\AdminController\ContactUsController;
-use App\Http\Controllers\Api\DepositController;
 use App\Http\Controllers\Api\ProfileController; // make sure this exists
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
-use App\Http\Controllers\Api\UserDocumentController;
-use App\Models\TransactionHistory;
-
-use App\Http\Controllers\Api\StripeWebhookController;
-use App\Http\Controllers\Api\WithDrawController;
-use App\Models\Campaign;
-use App\Models\User;
-use Illuminate\Auth\Events\Verified;
-use Illuminate\Support\Facades\Redirect;
 
 Route::prefix('v1')->group(function () {
 
@@ -133,6 +134,10 @@ Route::prefix('v1')->group(function () {
 
 
     Route::get('/deposit', [DepositController::class, 'index']);
+
+
+
+    Route::put('editbank', [CardController::class, 'update']);
 
 
 
