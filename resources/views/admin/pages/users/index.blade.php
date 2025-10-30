@@ -111,9 +111,9 @@
                                     <i class="fas fa-trash-alt"></i>
                                 </button>
                             </form>
-                            <button type="button" class="btn btn-info btn-sm view-details-btn" data-toggle="modal" data-target="#viewDetailsModal" data-user="{{ json_encode($user) }}">
+                            <!-- <button type="button" class="btn btn-info btn-sm view-details-btn" data-toggle="modal" data-target="#viewDetailsModal" data-user="{{ json_encode($user) }}">
                                 <i class="fas fa-eye"></i>
-                            </button>
+                            </button> -->
 
 
 
