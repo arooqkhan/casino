@@ -8,6 +8,11 @@ use App\Models\CampaignSubscribe;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
 
+use App\Helpers\MailHelper;
+use Illuminate\Http\Request;
+use App\Models\TransactionHistory;
+use Illuminate\Support\Facades\DB;
+
 class FinalizeCampaigns extends Command
 {
     protected $signature = 'campaigns:finalize';
@@ -65,6 +70,28 @@ class FinalizeCampaigns extends Command
                         'added_amount' => $campaign->winner_price,
                         'new_balance' => $user->balance,
                     ]);
+
+
+                    // ✅ 6. Send Winner Email
+                    try {
+                        $subject = "🎉 Congratulations! You Won the Campaign Prize";
+                        $message =  "Dear {$user->first_name} {$user->last_name},\n\n" .
+                            "Congratulations! You have been selected as the winner for the campaign '{$campaign->name}'.\n" .
+                            "You have received a prize of {$campaign->winner_price} credits which has been added to your account.\n\n" .
+                            "Best regards,\nThe Campaign Team";
+
+                        MailHelper::sendMail($user->email, $subject, $message);
+
+                        Log::info("Winner email sent", [
+                            'user_email' => $user->email,
+                            'campaign_id' => $campaign->id
+                        ]);
+                    } catch (\Exception $e) {
+                        Log::error("Failed to send winner email", [
+                            'error' => $e->getMessage(),
+                            'user_email' => $user->email ?? 'unknown',
+                        ]);
+                    }
                 }
 
                 Log::info("Winner chosen", ['campaign_id' => $campaign->id, 'winner_id' => $winner->user_id]);
