@@ -6,8 +6,8 @@
         <div class="widget-header">
             <div class="row">
                 <div class="col-12 d-flex justify-content-between align-items-center mb-2">
-                    <h3>Edit Bonus</h3>
-                    <a href="{{ route('bonus.index') }}" class="btn btn-success">Back</a>
+                    <h3>Edit Packages</h3>
+                    <a href="{{ route('Packages.index') }}" class="btn btn-success">Back</a>
                 </div>
             </div>
         </div>
@@ -36,7 +36,7 @@
 
                     <div class="row mb-4">
                         <div class="col-sm-6">
-                            <label for="icon">Icon (Image)</label>
+                            <label for="icon">Icon</label>
                             <input type="file" name="icon" id="icon" class="form-control">
                             @if($package->icon)
                             <p class="mt-2">
@@ -54,7 +54,7 @@
                         </div>
                     </div>
 
-                    
+
                     <div class="row mb-4">
                         <div class="col-sm-6">
                             <label for="color">Bonus Color</label>

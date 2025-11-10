@@ -39,7 +39,7 @@
 
                     <div class="row mb-4">
                         <div class="col-sm-6">
-                            <label for="icon">Icon (Image)</label>
+                            <label for="icon">Icon</label>
                             <input type="file" name="icon" id="icon" class="form-control">
                             @error('icon')
                             <span class="text-danger">{{ $message }}</span>
@@ -56,33 +56,33 @@
                         </div>
                     </div>
 
-                     {{-- ✅ New Fields --}}
-    <div class="row mb-4">
-        <div class="col-sm-6">
-            <label for="color">Bonus Color</label>
-            <div class="d-flex align-items-center">
-                <input type="color" name="color" id="color" class="form-control form-control-color"
-                       value="{{ old('color', '#ff0000') }}"
-                       style="width: 60px; height: 40px; padding: 2px;">
-                <span id="color-preview" class="ms-3 px-3 py-2 rounded"
-                      style="border:1px solid #ccc; background: {{ old('color', '#ff0000') }};">
-                    {{ old('color', '#ff0000') }}
-                </span>
-            </div>
-            @error('color')
-                <span class="text-danger">{{ $message }}</span>
-            @enderror
-        </div>
+                    {{-- ✅ New Fields --}}
+                    <div class="row mb-4">
+                        <div class="col-sm-6">
+                            <label for="color">Bonus Color</label>
+                            <div class="d-flex align-items-center">
+                                <input type="color" name="color" id="color" class="form-control form-control-color"
+                                    value="{{ old('color', '#ff0000') }}"
+                                    style="width: 60px; height: 40px; padding: 2px;">
+                                <span id="color-preview" class="ms-3 px-3 py-2 rounded"
+                                    style="border:1px solid #ccc; background: {{ old('color', '#ff0000') }};">
+                                    {{ old('color', '#ff0000') }}
+                                </span>
+                            </div>
+                            @error('color')
+                            <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
 
-        <div class="col-sm-6">
-            <label for="shadow">Shadow</label>
-            <input type="text" name="shadow" id="shadow" class="form-control"
-                   value="{{ old('shadow', '0px 0px 10px 0px') }}">
-            @error('shadow')
-                <span class="text-danger">{{ $message }}</span>
-            @enderror
-        </div>
-    </div>
+                        <div class="col-sm-6">
+                            <label for="shadow">Shadow</label>
+                            <input type="text" name="shadow" id="shadow" class="form-control"
+                                value="{{ old('shadow', '0px 0px 10px 0px') }}">
+                            @error('shadow')
+                            <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
 
 
 
