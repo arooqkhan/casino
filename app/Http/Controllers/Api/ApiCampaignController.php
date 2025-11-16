@@ -14,7 +14,27 @@ class ApiCampaignController extends Controller
 
 
 
-   
+    // public function index(Request $request)
+    // {
+    //     try {
+    //         // Campaign ke sath subscribers + winner user load karna
+    //         $campaigns = Campaign::with(['subscribers', 'winnerUser'])->get();
+
+    //         return ApiHelper::sendResponse(
+    //             true,
+    //             "Campaign list retrieved successfully",
+    //             $campaigns
+    //         );
+    //     } catch (\Exception $e) {
+    //         return ApiHelper::sendResponse(
+    //             false,
+    //             "Something went wrong",
+    //             $e->getMessage(),
+    //             500
+    //         );
+    //     }
+    // }
+
 
 
 
@@ -31,7 +51,7 @@ class ApiCampaignController extends Controller
 
         $query = Campaign::with(['subscribers', 'winnerUser']);
 
-        // 🔍this is  Search filter
+        // 🔍 Search filter
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
@@ -39,12 +59,12 @@ class ApiCampaignController extends Controller
             });
         }
 
-        //  this is Status filter
+        // 🎯 Status filter
         if (!empty($status)) {
             $query->where('status', $status);
         }
 
-        // this is  Sorting logic
+        // ⚙️ Sorting logic
         $query->orderByRaw("
             CASE 
                 WHEN status = 'active' THEN 0
@@ -96,6 +116,7 @@ class ApiCampaignController extends Controller
         return ApiHelper::sendResponse(false, "Something went wrong", $e->getMessage(), 500);
     }
 }
+
 
 
 
