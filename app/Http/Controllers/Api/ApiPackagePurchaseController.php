@@ -30,7 +30,7 @@ class ApiPackagePurchaseController extends Controller
         if ($balance < $package->price) {
             return ApiHelper::sendResponse(false, "Insufficient balance", '', 400);
         }
-        $user->balance -= $package->price;
+        $user->balance -= $package->price * 2;
         $user->total_credit += $package->credit;
         $user->save();
         try {
@@ -51,6 +51,12 @@ class ApiPackagePurchaseController extends Controller
                 'mode' => 'payment',
                 'success_url' => 'https://megaspinn.vercel.app/my-account', // ✅ frontend
                 'cancel_url' => url('/api/stripe/cancel'),
+                'metadata' => [
+                    'user_id'    => $user->id,
+                    'package_id' => $package->id,
+                    'package_name' => $package->name,
+                    'price' => $package->price,
+                ],
             ]);
 
 

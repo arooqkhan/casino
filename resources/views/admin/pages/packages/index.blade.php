@@ -25,7 +25,7 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 <div class="col-lg-12">
-    <h4 class="m-2 mt-4">Bonuses</h4>
+    <h4 class="m-2 mt-4">Packages</h4>
 
     <div class="statbox widget box box-shadow">
         @if(session('success'))
@@ -34,7 +34,8 @@
                 Swal.fire({
                     position: 'bottom-end',
                     icon: 'success',
-                    title: '{{ session('success') }}',
+                    title: '{{ session('
+                    success ') }}',
                     showConfirmButton: false,
                     timer: 3000,
                     toast: true,
@@ -52,7 +53,8 @@
                 Swal.fire({
                     position: 'bottom-end',
                     icon: 'error',
-                    title: '{{ session('error') }}',
+                    title: '{{ session('
+                    error ') }}',
                     showConfirmButton: false,
                     timer: 3000,
                     toast: true,
