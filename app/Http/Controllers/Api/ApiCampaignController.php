@@ -10,7 +10,7 @@ use App\Http\Controllers\Controller;
 class ApiCampaignController extends Controller
 {
 
-    
+
 
 
 
@@ -51,7 +51,7 @@ class ApiCampaignController extends Controller
 
         $query = Campaign::with(['subscribers', 'winnerUser']);
 
-        // 🔍 Search filter
+        // 🔍this is  Search filter
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
@@ -59,12 +59,12 @@ class ApiCampaignController extends Controller
             });
         }
 
-        // 🎯 Status filter
+        //  this is Status filter
         if (!empty($status)) {
             $query->where('status', $status);
         }
 
-        // ⚙️ Sorting logic
+        // this is  Sorting logic
         $query->orderByRaw("
             CASE 
                 WHEN status = 'active' THEN 0
