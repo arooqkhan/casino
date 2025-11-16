@@ -34,32 +34,38 @@ class ApiCampaignController extends Controller
     // }
 
 
-    public function index(Request $request)
-    {
-        try {
-            $search = $request->input('search');
-            $perPage = $request->input('per_page', 10);
-            $page = $request->input('page', 1);
+  public function index(Request $request)
+{
+    try {
+        $search = $request->input('search');
+        $status = $request->input('status'); 
+        $perPage = $request->input('per_page', 10);
+        $page = $request->input('page', 1);
 
-            $query = Campaign::with(['subscribers', 'winnerUser']);
+        $query = Campaign::with(['subscribers', 'winnerUser']);
 
-            // 🔍 Search support
-            if (!empty($search)) {
-                $query->where(function ($q) use ($search) {
-                    $q->where('name', 'like', "%{$search}%")
-                        ->orWhere('description', 'like', "%{$search}%");
-                });
-            }
+        // 🔍 Search filter
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
 
-            // ⚙️ Smart dynamic sorting logic
-            $query->orderByRaw("
+        // 🎯 Status filter
+        if (!empty($status)) {
+            $query->where('status', $status);
+        }
+
+        // ⚙️ Sorting logic
+        $query->orderByRaw("
             CASE 
                 WHEN status = 'active' THEN 0
                 WHEN status = 'upcoming' THEN 1
                 ELSE 2
             END
         ")
-                ->orderByRaw("
+        ->orderByRaw("
             CASE 
                 WHEN status = 'active' THEN end_at
                 WHEN status = 'upcoming' THEN start_at
@@ -67,22 +73,41 @@ class ApiCampaignController extends Controller
             END ASC
         ");
 
-            // 📄 Pagination
-            $campaigns = $query->paginate($perPage, ['*'], 'page', $page);
+        // 📌 SPECIAL CASE:
+        // If status = active → show ALL active records in one page (no pagination)
+        if ($status === 'active') {
+            $campaigns = $query->get(); // all results
 
             return ApiHelper::sendResponse(
                 true,
-                "Campaign list retrieved successfully",
+                "Active campaign list",
                 [
-                    "data" => $campaigns->items(),
-                    "current_page" => $campaigns->currentPage(),
-                    "last_page" => $campaigns->lastPage(),
-                    "per_page" => $campaigns->perPage(),
-                    "total" => $campaigns->total(),
+                    "data" => $campaigns,
+                    "current_page" => 1,
+                    "last_page" => 1,
+                    "per_page" => $campaigns->count(),
+                    "total" => $campaigns->count(),
                 ]
             );
-        } catch (\Exception $e) {
-            return ApiHelper::sendResponse(false, "Something went wrong", $e->getMessage(), 500);
         }
+
+        // 📄 Normal pagination for other statuses
+        $campaigns = $query->paginate($perPage, ['*'], 'page', $page);
+
+        return ApiHelper::sendResponse(
+            true,
+            "Campaign list retrieved successfully",
+            [
+                "data" => $campaigns->items(),
+                "current_page" => $campaigns->currentPage(),
+                "last_page" => $campaigns->lastPage(),
+                "per_page" => $campaigns->perPage(),
+                "total" => $campaigns->total(),
+            ]
+        );
+    } catch (\Exception $e) {
+        return ApiHelper::sendResponse(false, "Something went wrong", $e->getMessage(), 500);
     }
+}
+
 }
