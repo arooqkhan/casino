@@ -41,7 +41,7 @@ class ApiCampaignController extends Controller
 
 
 
-  public function index(Request $request)
+ public function index(Request $request)
 {
     try {
         $search = $request->input('search');
@@ -51,7 +51,7 @@ class ApiCampaignController extends Controller
 
         $query = Campaign::with(['subscribers', 'winnerUser']);
 
-        // 🔍 Search filter
+        // 🔍 SEARCH FILTER
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
@@ -59,12 +59,12 @@ class ApiCampaignController extends Controller
             });
         }
 
-        // 🎯 Status filter
+        // 🎯 STATUS FILTER (active, upcoming, expired)
         if (!empty($status)) {
             $query->where('status', $status);
         }
 
-        // ⚙️ Sorting logic
+        // ⚙️ SORTING LOGIC
         $query->orderByRaw("
             CASE 
                 WHEN status = 'active' THEN 0
@@ -80,10 +80,10 @@ class ApiCampaignController extends Controller
             END ASC
         ");
 
-        // 📌 SPECIAL CASE:
-        // If status = active → show ALL active records in one page (no pagination)
+        // ⭐ SPECIAL CASE → ACTIVE → SHOW ALL (NO PAGINATION)
         if ($status === 'active') {
-            $campaigns = $query->get(); // all results
+
+            $campaigns = $query->get();
 
             return ApiHelper::sendResponse(
                 true,
@@ -98,7 +98,7 @@ class ApiCampaignController extends Controller
             );
         }
 
-        // 📄 Normal pagination for other statuses
+        // 🧾 NORMAL PAGINATION FOR other statuses
         $campaigns = $query->paginate($perPage, ['*'], 'page', $page);
 
         return ApiHelper::sendResponse(
@@ -112,10 +112,12 @@ class ApiCampaignController extends Controller
                 "total" => $campaigns->total(),
             ]
         );
+
     } catch (\Exception $e) {
         return ApiHelper::sendResponse(false, "Something went wrong", $e->getMessage(), 500);
     }
 }
+
 
 
 
