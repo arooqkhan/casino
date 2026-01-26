@@ -98,6 +98,8 @@ Route::prefix('v1')->group(function () {
 
     Route::get('/campaigns', [ApiCampaignController::class, 'index']);
 
+    
+
     Route::get('/packages', [ApiPackageController::class, 'index']);
 
 
